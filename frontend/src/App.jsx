@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -18,6 +18,7 @@ import AdminLayout from "./admin/AdminLayout";
 import AdminLogin from "./admin/AdminLogin";
 import Dashboard from "./admin/Dashboard";
 import AdminPages from "./admin/AdminPages";
+
 import MutualFunds from "./pages/MutualFunds";
 import TaxConsultancy from "./pages/TaxConsultancy";
 import Insurance from "./pages/Insurance";
@@ -45,7 +46,6 @@ function WebsiteLayout() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
 
-          {/* Services */}
           {/* Individual Service Pages */}
           <Route path="/mutual-funds" element={<MutualFunds />} />
           <Route path="/tax-consultancy" element={<TaxConsultancy />} />
@@ -53,7 +53,11 @@ function WebsiteLayout() {
           <Route path="/loans" element={<Loans />} />
           <Route path="/fd-bonds" element={<FDBonds />} />
           <Route path="/estate-planning" element={<EstatePlanning />} />
+
+          {/* All Services */}
           <Route path="/services" element={<AllServices />} />
+
+          {/* Dynamic Service Pages */}
           <Route path="/:slug" element={<ServiceDetail />} />
         </Routes>
       </main>
@@ -65,7 +69,7 @@ function WebsiteLayout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Main Website */}
         <Route path="/*" element={<WebsiteLayout />} />
@@ -98,6 +102,6 @@ export default function App() {
           />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
