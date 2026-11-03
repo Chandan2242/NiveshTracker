@@ -303,7 +303,7 @@ export default function Contact() {
 
           <iframe
             title="Wealth Bees office location"
-            src="https://maps.google.com/maps?q=Wealth%20Bees%2C%20Janki%20Vallabh%20Complex%2C%20Veer%20Vinay%20achowk%2C%20near%20Union%20Bank%2C%20Mohalla%20Chikni%2C%20Alijanpurva%2C%20Balrampur%2C%20Uttar%20Pradesh%20271201%2C%20India&t=&z=16&output=embed"
+            src="https://www.google.com/maps/dir/26.8992896,80.9182975/Wealth+Bees,+Janki+Vallabh+Complex,+Veer+Vinay+achowk,+near+Union+Bank,+Mohalla+Chikni,+Alijanpurva,+Balrampur,+Uttar+Pradesh+271201/@27.144184,80.2298002,8z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x3999d95a5505dbc7:0x6e8a991c5710a5ac!2m2!1d82.1799882!2d27.4301134!3e0!5m1!1e4?entry=ttu&g_ep=EgoyMDI2MTEwMS4wIKXMDSoASAFQAw%3D%3D"
             width="100%"
             height="500"
             style={{ border: 0, display: "block" }}

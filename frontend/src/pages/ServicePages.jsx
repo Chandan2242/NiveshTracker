@@ -12,8 +12,12 @@ import {
   CheckCircle2,
   HandCoins,
   PiggyBank,
+  BriefcaseBusiness,
+  Layers3,
+  Globe2,
 } from "lucide-react";
 
+// All Services
 const services = [
   {
     slug: "mutual-funds",
@@ -31,11 +35,71 @@ const services = [
     ],
   },
   {
-    slug: "tax-consultancy",
-    title: "Tax Consultancy",
+    slug: "pms",
+    title: "PMS",
+    short: "Professionally managed, concentrated portfolios for eligible investors.",
+    description:
+      "Explore Portfolio Management Services through our empanelled partners and understand portfolio strategies, eligibility, risks and investment requirements.",
+    icon: BriefcaseBusiness,
+    tag: "Portfolio Management",
+    benefits: [
+      "Understand Portfolio Management Services",
+      "Explore different portfolio strategies",
+      "Learn about eligibility and investment requirements",
+      "Understand associated risks and fees",
+    ],
+  },
+  {
+    slug: "aif",
+    title: "AIF",
+    short: "Explore alternative investment opportunities.",
+    description:
+      "Learn about Category I, II and III Alternative Investment Funds and explore opportunities through our empanelled fund managers.",
+    icon: Layers3,
+    tag: "Alternative Investments",
+    benefits: [
+      "Understand Category I, II and III AIFs",
+      "Explore alternative investment strategies",
+      "Learn about eligibility and investment requirements",
+      "Understand investment risks and fund structures",
+    ],
+  },
+  {
+    slug: "sif",
+    title: "SIF",
+    short: "Explore specialised investment funds.",
+    description:
+      "Understand Specialised Investment Funds, their strategies, eligibility and how they differ from mutual funds and PMS.",
+    icon: TrendingUp,
+    tag: "Specialised Investment",
+    benefits: [
+      "Understand the SIF investment category",
+      "Explore different investment strategies",
+      "Learn about eligibility requirements",
+      "Understand associated risks and costs",
+    ],
+  },
+  {
+    slug: "insurance",
+    title: "Insurance",
+    short: "Explore protection options for life's uncertainties.",
+    description:
+      "Explore life, health and general insurance options through our registered insurer panel and understand coverage requirements.",
+    icon: ShieldCheck,
+    tag: "Protection",
+    benefits: [
+      "Understand life and health insurance",
+      "Review your coverage needs",
+      "Learn about premiums and policy terms",
+      "Understand exclusions and claim conditions",
+    ],
+  },
+  {
+    slug: "tax-planning",
+    title: "Tax Planning",
     short: "Make informed decisions about tax planning.",
     description:
-      "Understand tax planning, applicable deductions and tax-related requirements to organise your finances more effectively.",
+      "Explore general tax-planning inputs alongside your investments and understand applicable tax provisions and deductions.",
     icon: Calculator,
     tag: "Tax Planning",
     benefits: [
@@ -46,18 +110,48 @@ const services = [
     ],
   },
   {
-    slug: "insurance",
-    title: "Insurance",
-    short: "Explore protection options for life's uncertainties.",
+    slug: "tax-consultancy",
+    title: "Tax Consultancy",
+    short: "Understand tax planning and tax-related requirements.",
     description:
-      "Learn about insurance options and understand how protection planning may help safeguard your family and financial goals.",
-    icon: ShieldCheck,
-    tag: "Protection",
+      "Understand tax planning, applicable deductions and tax-related requirements to organise your finances more effectively.",
+    icon: FileCheck,
+    tag: "Tax Consultancy",
     benefits: [
-      "Understand life and health insurance",
-      "Review coverage needs",
-      "Learn about premiums and policy terms",
-      "Understand exclusions and claim conditions",
+      "Understand applicable tax provisions",
+      "Explore eligible deductions and exemptions",
+      "Plan tax-related financial decisions",
+      "Organise relevant financial documents",
+    ],
+  },
+  {
+    slug: "estate-planning",
+    title: "Estate Planning",
+    short: "Plan how your assets may be managed and transferred.",
+    description:
+      "Understand the basics of wills, nominations and succession planning with support from a legal partner.",
+    icon: House,
+    tag: "Legacy Planning",
+    benefits: [
+      "Understand the purpose of a will",
+      "Review nominations and asset records",
+      "Organise important financial documents",
+      "Learn about succession planning",
+    ],
+  },
+  {
+    slug: "gift-city-investing",
+    title: "GIFT City Investing",
+    short: "Explore global investment access through GIFT City's IFSC.",
+    description:
+      "Learn about global investment opportunities through GIFT City's IFSC with the support of a designated partner.",
+    icon: Globe2,
+    tag: "Global Investments",
+    benefits: [
+      "Understand GIFT City's IFSC framework",
+      "Explore available investment opportunities",
+      "Understand eligibility and onboarding requirements",
+      "Learn about associated risks and regulations",
     ],
   },
   {
@@ -90,23 +184,9 @@ const services = [
       "Understand liquidity and investment risks",
     ],
   },
-  {
-    slug: "estate-planning",
-    title: "Estate Planning",
-    short: "Plan how your assets may be managed and transferred.",
-    description:
-      "Understand the basics of wills, nominations and succession planning to help organise your assets and communicate your wishes.",
-    icon: House,
-    tag: "Legacy Planning",
-    benefits: [
-      "Understand the purpose of a will",
-      "Review nominations and asset records",
-      "Organise important financial documents",
-      "Learn about succession planning",
-    ],
-  },
 ];
 
+// General Services
 const generalServices = [
   {
     title: "Financial Planning",
@@ -121,12 +201,6 @@ const generalServices = [
     icon: TrendingUp,
   },
   {
-    title: "Tax Planning",
-    description:
-      "Learn about tax-related financial planning and applicable provisions.",
-    icon: FileCheck,
-  },
-  {
     title: "Protection Planning",
     description:
       "Review your insurance needs and financial protection priorities.",
@@ -138,19 +212,17 @@ const generalServices = [
       "Understand borrowing options, interest and repayment commitments.",
     icon: HandCoins,
   },
-  {
-    title: "Estate Planning",
-    description:
-      "Learn how wills, nominations and asset planning work.",
-    icon: Building2,
-  },
 ];
 
+// Page Hero
 function PageHero({ eyebrow, title, description }) {
   return (
-    <section className="bg-[#f2f8f7] px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
-      <div className="mx-auto max-w-7xl">
-        <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#3D7A89]">
+    <section className="relative isolate overflow-hidden bg-[#f3faf6] px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
+      <div className="pointer-events-none absolute -right-24 -top-20 -z-10 h-80 w-80 rounded-full bg-emerald-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 left-0 -z-10 h-72 w-72 rounded-full bg-teal-100/70 blur-3xl" />
+
+      <div className="relative z-10 mx-auto max-w-[1440px]">
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#007A55]">
           {eyebrow}
         </p>
 
@@ -165,14 +237,14 @@ function PageHero({ eyebrow, title, description }) {
         <div className="mt-7 flex flex-wrap gap-3">
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#3D7A89] px-6 py-3.5 font-semibold text-white transition hover:bg-[#306673]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#007A55] px-6 py-3.5 font-semibold text-white transition hover:bg-[#006447]"
           >
             Make an Enquiry <ArrowRight size={18} />
           </Link>
 
           <Link
             to="/financial-calculator"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 font-semibold text-slate-700 transition hover:border-[#3D7A89] hover:text-[#3D7A89]"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 font-semibold text-slate-700 transition hover:border-[#007A55] hover:text-[#007A55]"
           >
             Financial Calculator
           </Link>
@@ -182,20 +254,23 @@ function PageHero({ eyebrow, title, description }) {
   );
 }
 
+// Individual Service Card
 function ServiceCard({ service }) {
   const Icon = service.icon;
 
   return (
-    <article className="group flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[#3D7A89]/40 hover:shadow-xl sm:p-7">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#3D7A89]/10 text-[#3D7A89] transition group-hover:bg-[#3D7A89] group-hover:text-white">
-        <Icon size={27} />
+    <article className="group flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-950/5 sm:p-7">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 transition group-hover:bg-emerald-700 group-hover:text-white">
+          <Icon size={27} />
+        </div>
+
+        <span className="rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-slate-500">
+          {service.tag || "Financial Service"}
+        </span>
       </div>
 
-      <span className="mt-5 text-xs font-bold uppercase tracking-wider text-[#3D7A89]">
-        {service.tag || "Financial Service"}
-      </span>
-
-      <h2 className="mt-2 text-xl font-bold text-slate-900">
+      <h2 className="mt-6 text-xl font-bold text-slate-900">
         {service.title}
       </h2>
 
@@ -203,19 +278,23 @@ function ServiceCard({ service }) {
         {service.short || service.description}
       </p>
 
-      <Link
-to={service.slug ? `/${service.slug}` : "/services"}        className="mt-6 inline-flex items-center gap-2 border-t border-slate-100 pt-5 text-sm font-bold text-[#3D7A89]"
-      >
-        Explore Service
-        <ArrowRight
-          size={17}
-          className="transition group-hover:translate-x-1"
-        />
-      </Link>
+      {service.slug && (
+        <Link
+          to={`/${service.slug}`}
+          className="mt-6 inline-flex items-center gap-2 border-t border-slate-100 pt-5 text-sm font-bold text-[#007A55]"
+        >
+          Explore Service
+          <ArrowRight
+            size={17}
+            className="transition group-hover:translate-x-1"
+          />
+        </Link>
+      )}
     </article>
   );
 }
 
+// All Services Page
 export function AllServices() {
   return (
     <>
@@ -225,8 +304,11 @@ export function AllServices() {
         description="Explore financial planning, investment education and other services designed to help you make informed financial decisions."
       />
 
-      <section className="bg-[#f8faf9] px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative isolate overflow-hidden bg-[#f7faf8] px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
+        <div className="pointer-events-none absolute -top-24 left-0 -z-10 h-72 w-72 rounded-full bg-teal-100/70 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 -bottom-20 -z-10 h-80 w-80 rounded-full bg-emerald-200/40 blur-3xl" />
+
+        <div className="relative z-10 mx-auto max-w-[1440px]">
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
               Explore Our Services
@@ -270,11 +352,9 @@ export function AllServices() {
   );
 }
 
-
+// Individual Service Detail Page
 export default function ServiceDetail() {
-  const location = useLocation();
-
-  const slug = location.pathname.replace("/", "");
+  const { slug } = useParams();
 
   const service = services.find((item) => item.slug === slug);
 
@@ -291,7 +371,7 @@ export default function ServiceDetail() {
 
         <Link
           to="/services"
-          className="mt-6 inline-flex rounded-xl bg-[#3D7A89] px-6 py-3 font-semibold text-white"
+          className="mt-6 inline-flex rounded-xl bg-[#007A55] px-6 py-3 font-semibold text-white"
         >
           View All Services
         </Link>
@@ -309,10 +389,13 @@ export default function ServiceDetail() {
         description={service.description}
       />
 
-      <section className="bg-white px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.4fr_0.8fr]">
+      <section className="relative isolate overflow-hidden bg-white px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
+        <div className="pointer-events-none absolute -right-24 -top-20 -z-10 h-80 w-80 rounded-full bg-emerald-100/50 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-0 -z-10 h-72 w-72 rounded-full bg-teal-50 blur-3xl" />
+
+        <div className="relative z-10 mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[1.4fr_0.8fr]">
           <div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#3D7A89]/10 text-[#3D7A89]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#007A55]/10 text-[#007A55]">
               <Icon size={28} />
             </div>
 
@@ -329,7 +412,7 @@ export default function ServiceDetail() {
                 <div key={benefit} className="flex items-start gap-3">
                   <CheckCircle2
                     size={21}
-                    className="mt-1 shrink-0 text-[#3D7A89]"
+                    className="mt-1 shrink-0 text-[#007A55]"
                   />
                   <p className="leading-7 text-slate-700">{benefit}</p>
                 </div>
@@ -337,8 +420,8 @@ export default function ServiceDetail() {
             </div>
           </div>
 
-          <aside className="h-fit rounded-3xl border border-slate-200 bg-[#f7faf9] p-7 sm:p-8">
-            <p className="text-sm font-bold uppercase tracking-widest text-[#3D7A89]">
+          <aside className="h-fit rounded-3xl border border-emerald-100 bg-[#EDFCF4] p-7 sm:p-8">
+            <p className="text-sm font-bold uppercase tracking-widest text-[#007A55]">
               Get Started
             </p>
 
@@ -353,14 +436,14 @@ export default function ServiceDetail() {
 
             <Link
               to="/contact"
-              className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3D7A89] px-5 py-3.5 font-semibold text-white"
+              className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#007A55] px-5 py-3.5 font-semibold text-white transition hover:bg-[#006447]"
             >
               Send an Enquiry <ArrowRight size={18} />
             </Link>
 
             <Link
               to="/services"
-              className="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#3D7A89]"
+              className="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#007A55]"
             >
               View All Services <ArrowRight size={16} />
             </Link>

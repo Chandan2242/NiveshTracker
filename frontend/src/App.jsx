@@ -13,7 +13,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
-
+import ServiceDetail, { AllServices } from "./pages/ServicePages";
 import AdminLayout from "./admin/AdminLayout";
 import AdminLogin from "./admin/AdminLogin";
 import Dashboard from "./admin/Dashboard";
@@ -53,6 +53,8 @@ function WebsiteLayout() {
           <Route path="/loans" element={<Loans />} />
           <Route path="/fd-bonds" element={<FDBonds />} />
           <Route path="/estate-planning" element={<EstatePlanning />} />
+          <Route path="/services" element={<AllServices />} />
+          <Route path="/:slug" element={<ServiceDetail />} />
         </Routes>
       </main>
 
