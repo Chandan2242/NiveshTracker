@@ -1,0 +1,1236 @@
+<title>Nivesh Track Services</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg: #f2f5ef;
+    --paper: #fbfcf9;
+    --paper-2: #eef2ea;
+    --ink: #16241d;
+    --ink-soft: #45564c;
+    --muted: #6b7a70;
+    --line: #d7ded3;
+    --line-strong: #b7c3b2;
+    --primary: #1b4b3a;
+    --primary-light: #2e6b54;
+    --primary-tint: #e3ede7;
+    --accent: #c9862b;
+    --accent-dark: #9c6a1f;
+    --accent-tint: #f3e2bf;
+    --warn: #a3551c;
+    --warn-tint: #f6e3cd;
+    --ok: #2e6b54;
+    --ok-tint: #e3ede7;
+    --shadow: 0 1px 2px rgba(22,36,29,0.06), 0 8px 24px -12px rgba(22,36,29,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #0d1a14; --paper: #122419; --paper-2: #16291d;
+      --ink: #eaf1ea; --ink-soft: #b9c9bd; --muted: #90a397;
+      --line: #24392c; --line-strong: #345040;
+      --primary: #5fa287; --primary-light: #7cbb9e; --primary-tint: #163427;
+      --accent: #e3a94a; --accent-dark: #f0bd6c; --accent-tint: #2c2413;
+      --warn: #e0954c; --warn-tint: #2e2111;
+      --ok: #5fa287; --ok-tint: #163427;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -14px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #0d1a14; --paper: #122419; --paper-2: #16291d;
+    --ink: #eaf1ea; --ink-soft: #b9c9bd; --muted: #90a397;
+    --line: #24392c; --line-strong: #345040;
+    --primary: #5fa287; --primary-light: #7cbb9e; --primary-tint: #163427;
+    --accent: #e3a94a; --accent-dark: #f0bd6c; --accent-tint: #2c2413;
+    --warn: #e0954c; --warn-tint: #2e2111;
+    --ok: #5fa287; --ok-tint: #163427;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -14px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:"Public Sans",-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:"Fraunces",Georgia,serif; font-weight:600; line-height:1.14; text-wrap:balance; margin:0 0 .5em; color:var(--ink);}
+  p{margin:0 0 1em; color:var(--ink-soft);}
+  a{color:inherit;}
+  .num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
+  .wrap{max-width:1160px; margin:0 auto; padding:0 28px;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace; text-transform:uppercase; letter-spacing:.12em; font-size:.72rem; color:var(--primary); display:inline-flex; align-items:center; gap:.5em; margin-bottom:1em;}
+  :root[data-theme="dark"] .eyebrow, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .eyebrow{color:var(--primary-light);} }
+  .eyebrow::before{content:""; width:22px; height:1px; background:currentColor; display:inline-block;}
+
+  .btn{font-family:"Public Sans",sans-serif; font-size:.95rem; font-weight:600; cursor:pointer; border-radius:999px; border:1px solid transparent; padding:.85em 1.6em; display:inline-flex; align-items:center; gap:.5em; text-decoration:none; transition:transform .15s ease, background .15s ease, border-color .15s ease;}
+  .btn:focus-visible, a:focus-visible, button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .btn-primary{background:var(--primary); color:#f7faf6; border-color:var(--primary);}
+  .btn-primary:hover{background:var(--primary-light); border-color:var(--primary-light);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--line-strong);}
+  .btn-ghost:hover{border-color:var(--primary); color:var(--primary);}
+  :root[data-theme="dark"] .btn-ghost:hover, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn-ghost:hover{color:var(--primary-light);} }
+  .btn-sm{padding:.6em 1.1em; font-size:.84rem;}
+
+  .strip{background:var(--primary); color:#eef3ee; font-family:"IBM Plex Mono",monospace; font-size:.72rem;}
+  .strip .wrap{display:flex; justify-content:space-between; gap:1em; padding:.55em 28px; flex-wrap:wrap;}
+  .strip .fill{opacity:.85;}
+
+  header{position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  nav.wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 28px;}
+  .logo{display:flex; align-items:center; gap:.6em; font-family:"Fraunces",serif; font-weight:600; font-size:1.1rem; text-decoration:none; color:var(--ink);}
+  .logo-mark{width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; flex:none;}
+  .logo > span:last-child{display:flex; flex-direction:column; line-height:1.2;}
+  .brand-tag{font-family:"Public Sans",sans-serif; font-weight:500; font-size:.58rem; letter-spacing:.02em; color:var(--muted);}
+
+  .navlinks{display:flex; align-items:center; gap:1.15em;}
+  .navlinks > a, .has-drop > button{font-size:.88rem; font-weight:600; text-decoration:none; color:var(--ink-soft); background:none; border:none; font-family:"Public Sans",sans-serif; cursor:pointer; display:flex; align-items:center; gap:.3em; padding:.3em 0; white-space:nowrap;}
+  .navlinks > a:hover, .has-drop > button:hover{color:var(--primary);}
+  .has-drop{position:relative;}
+  .has-drop svg{width:11px;height:11px;}
+  .dropdown{
+    position:absolute; top:calc(100% + 14px); left:50%; transform:translateX(-50%);
+    background:var(--paper); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow);
+    width:420px; padding:10px; display:grid; grid-template-columns:1fr 1fr; gap:2px;
+    opacity:0; pointer-events:none; translate:0 6px; transition:opacity .15s ease, translate .15s ease;
+  }
+  .dropdown.single{width:260px; grid-template-columns:1fr;}
+  .has-drop:hover .dropdown, .has-drop:focus-within .dropdown{opacity:1; pointer-events:auto; translate:0 0;}
+  .dropdown a{display:block; padding:.7em .8em; border-radius:9px; text-decoration:none; color:var(--ink);}
+  .dropdown a:hover{background:var(--primary-tint);}
+  .dropdown a strong{display:block; font-size:.86rem; font-weight:600;}
+  .dropdown a span{display:block; font-size:.74rem; color:var(--muted); margin-top:.15em;}
+  .nav-cta{display:flex; align-items:center; gap:.7em;}
+  .nav-toggle{display:none; background:none; border:none; padding:.4em;}
+  .nav-toggle svg{width:22px;height:22px;stroke:var(--ink);}
+
+  @media (max-width:1040px){
+    .navlinks{position:fixed; inset:60px 0 auto 0; background:var(--paper); flex-direction:column; align-items:stretch; gap:0; border-bottom:1px solid var(--line); max-height:calc(100vh - 60px); overflow:auto; transform:translateY(-8px); opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease; padding:8px 20px 20px;}
+    .navlinks.open{opacity:1; transform:translateY(0); pointer-events:auto;}
+    .navlinks > a{padding:.85em 0; border-bottom:1px solid var(--line);}
+    .has-drop{width:100%;}
+    .has-drop > button{width:100%; justify-content:space-between; padding:.85em 0; border-bottom:1px solid var(--line);}
+    .dropdown, .dropdown.single{position:static; transform:none; width:100%; box-shadow:none; border:none; grid-template-columns:1fr; opacity:1; pointer-events:auto; translate:0; display:none; padding:0 0 10px;}
+    .has-drop.open .dropdown{display:grid;}
+    .nav-toggle{display:block;}
+    .nav-cta .btn-ghost{display:none;}
+  }
+
+  .hero{padding:68px 0 52px;}
+  .hero .wrap{display:grid; grid-template-columns:1.05fr .95fr; gap:52px; align-items:center;}
+  .hero h1{font-size:clamp(2rem,3.6vw,2.9rem); letter-spacing:-.01em;}
+  .hero .lede{font-size:1.02rem; max-width:52ch;}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin:26px 0 20px;}
+  .hero-note{font-size:.8rem; color:var(--muted); display:flex; align-items:flex-start; gap:.5em; max-width:48ch;}
+  .hero-note svg{width:15px;height:15px; flex:none; stroke:var(--primary); margin-top:.15em;}
+
+  .passbook{background:var(--paper); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden;}
+  .passbook-head{background:var(--primary); color:#eef3ee; padding:18px 20px; display:flex; justify-content:space-between; align-items:flex-start;}
+  .passbook-head .b1{font-family:"Fraunces",serif; font-size:1rem;}
+  .passbook-head .b2{font-family:"IBM Plex Mono",monospace; font-size:.65rem; opacity:.85; text-align:right;}
+  .prow{display:flex; justify-content:space-between; gap:1em; padding:12px 20px; border-bottom:1px dashed var(--line); font-size:.83rem;}
+  .prow:last-child{border-bottom:none;}
+  .prow .desc strong{display:block; font-size:.88rem; color:var(--ink);}
+  .prow .desc span{color:var(--muted); font-size:.75rem;}
+  .prow .amt{font-family:"IBM Plex Mono",monospace; color:var(--primary); font-weight:600; white-space:nowrap; font-size:.78rem;}
+  :root[data-theme="dark"] .prow .amt, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .prow .amt{color:var(--primary-light);} }
+  .passbook-foot{padding:14px 20px; background:var(--paper-2); display:flex; justify-content:space-between; align-items:center; font-size:.76rem; color:var(--muted);}
+  .passbook-foot .dot{width:7px;height:7px;border-radius:50%;background:var(--accent); display:inline-block; margin-right:.5em;}
+
+  .facts{border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--paper);}
+  .facts .wrap{display:flex; flex-wrap:wrap; gap:0; padding:0;}
+  .fact{flex:1 1 220px; padding:20px 24px; border-right:1px solid var(--line); display:flex; gap:.7em; align-items:flex-start;}
+  .fact:last-child{border-right:none;}
+  .fact svg{width:17px;height:17px; stroke:var(--primary); flex:none; margin-top:.2em;}
+  :root[data-theme="dark"] .fact svg, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .fact svg{stroke:var(--primary-light);} }
+  .fact strong{display:block; font-size:.86rem;}
+  .fact span{font-size:.78rem; color:var(--muted);}
+
+  section{padding:70px 0;}
+  .section-head{max-width:680px; margin-bottom:38px;}
+  .section-head h2{font-size:clamp(1.55rem,2.4vw,2.05rem);}
+  .band-paper{background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+  .devnote{background:var(--warn-tint); border:1px dashed var(--warn); border-radius:12px; padding:16px 20px; margin-bottom:34px; display:flex; gap:.8em; align-items:flex-start;}
+  .devnote svg{width:17px;height:17px; stroke:var(--warn); flex:none; margin-top:.2em;}
+  .devnote p{margin:0; font-size:.84rem; color:var(--ink-soft);}
+  .devnote strong{color:var(--warn);}
+
+  /* other-services registry */
+  .svc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:34px;}
+  .svc-card{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:8px;}
+  .svc-idx{font-family:"IBM Plex Mono",monospace; font-size:.72rem; color:var(--accent-dark);}
+  .svc-card h3{font-size:1rem; margin:.1em 0 0;}
+  .svc-card p{font-size:.86rem; margin:0;}
+  @media (max-width:900px){.svc-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:600px){.svc-grid{grid-template-columns:1fr;}}
+
+  .badge{font-family:"IBM Plex Mono",monospace; font-size:.65rem; letter-spacing:.03em; padding:.35em .7em; border-radius:999px; white-space:nowrap; flex:none; display:inline-block;}
+  .badge-ok{background:var(--ok-tint); color:var(--ok); border:1px solid var(--ok);}
+  .badge-warn{background:var(--warn-tint); color:var(--warn); border:1px dashed var(--warn);}
+
+  /* shared form styling (lead form + awareness form) */
+  .lead-wrap{background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:30px;}
+  .lead-wrap h3{font-size:1.05rem; margin-bottom:.3em;}
+  .lead-wrap > p{font-size:.88rem; max-width:60ch;}
+  .form-grid{display:grid; gap:14px; margin-top:16px;}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .form-row.three{grid-template-columns:1fr 1fr 1fr;}
+  .form-field{display:flex; flex-direction:column; gap:.4em; font-size:.78rem; color:var(--muted); font-weight:600;}
+  .form-field input, .form-field select, .form-field textarea{
+    border:1px solid var(--line-strong); border-radius:10px; padding:.7em .85em;
+    background:var(--bg); font-family:"Public Sans",sans-serif; font-size:.92rem; color:var(--ink);
+    outline:none; resize:vertical;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus{border-color:var(--primary);}
+  .form-fine{font-size:.76rem; color:var(--muted); margin:10px 0 0;}
+  @media (max-width:700px){.form-row, .form-row.three{grid-template-columns:1fr;}}
+
+  .ledger{border-top:1px solid var(--line-strong);}
+  .lentry{display:grid; grid-template-columns:56px 1fr 1fr; gap:22px; padding:24px 0; border-bottom:1px solid var(--line); align-items:start;}
+  .lentry .idx{font-family:"IBM Plex Mono",monospace; color:var(--accent-dark); font-size:.92rem; padding-top:.2em;}
+  .lentry h3{font-size:1.04rem; margin-bottom:.3em;}
+  .lentry p{margin:0; max-width:46ch; font-size:.92rem;}
+  .lentry .check{justify-self:end; width:22px;height:22px; border-radius:50%; background:var(--primary-tint); color:var(--primary); display:flex;align-items:center;justify-content:center; flex:none;}
+  :root[data-theme="dark"] .lentry .check, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .lentry .check{color:var(--primary-light);} }
+  .lentry .check svg{width:12px;height:12px;}
+  @media (max-width:720px){.lentry{grid-template-columns:36px 1fr;} .lentry .check{display:none;}}
+
+  .store-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .store-badge{display:inline-flex; align-items:center; gap:.65em; background:var(--ink); color:#fff; border-radius:11px; padding:.6em 1.05em; text-decoration:none; border:1px solid var(--ink);}
+  :root[data-theme="dark"] .store-badge, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .store-badge{background:var(--paper-2); color:var(--ink); border-color:var(--line-strong);} }
+  .store-badge svg{width:20px;height:20px;flex:none;}
+  .store-badge .txt{display:flex; flex-direction:column; line-height:1.1;}
+  .store-badge .txt small{font-size:.6rem; opacity:.85;}
+  .store-badge .txt strong{font-size:.94rem; font-family:"Public Sans",sans-serif;}
+
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); border-radius:16px; overflow:hidden;}
+  .step{padding:26px 22px; background:var(--paper); border-right:1px solid var(--line);}
+  .step:last-child{border-right:none;}
+  .step .idx{font-family:"IBM Plex Mono",monospace; color:var(--accent-dark); font-size:.76rem; letter-spacing:.06em;}
+  .step h3{font-size:.98rem; margin:.5em 0 .35em;}
+  .step p{font-size:.85rem; margin:0;}
+  @media (max-width:860px){.steps{grid-template-columns:1fr 1fr;} .step{border-bottom:1px solid var(--line);} .step:nth-child(2){border-right:none;} .step:nth-child(4){border-right:none;}}
+  @media (max-width:560px){.steps{grid-template-columns:1fr;} .step{border-right:none !important;}}
+
+  .guidance-grid{display:grid; grid-template-columns:1fr 1fr; gap:38px; align-items:start;}
+  .guidance-copy h3{font-size:1.1rem; margin-bottom:.5em;}
+  .guidance-copy p{font-size:.93rem;}
+  .guidance-copy em{color:var(--primary); font-style:normal; font-weight:600;}
+  :root[data-theme="dark"] .guidance-copy em, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .guidance-copy em{color:var(--primary-light);} }
+  .guidance-ctas{display:flex; flex-direction:column; gap:14px; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:26px;}
+  .guidance-ctas .mini{display:flex; justify-content:space-between; align-items:center; gap:1em; padding:14px 16px; border:1px solid var(--line); border-radius:12px; text-decoration:none; color:var(--ink);}
+  .guidance-ctas .mini:hover{border-color:var(--primary);}
+  .guidance-ctas .mini strong{display:block; font-size:.92rem;}
+  .guidance-ctas .mini span{display:block; font-size:.78rem; color:var(--muted); margin-top:.15em;}
+  .guidance-ctas .mini svg{width:16px;height:16px; flex:none; stroke:var(--primary);}
+  :root[data-theme="dark"] .guidance-ctas .mini svg, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .guidance-ctas .mini svg{stroke:var(--primary-light);} }
+  .callback-box{border-top:1px solid var(--line); margin-top:4px; padding-top:18px;}
+  .callback-box > strong{display:block; font-size:.92rem; margin-bottom:.3em;}
+  .callback-box > p{font-size:.8rem; margin:0 0 12px;}
+  .callback-box .form-grid{gap:10px;}
+  @media (max-width:780px){.guidance-grid{grid-template-columns:1fr;}}
+
+  /* calculators */
+  .calc-tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
+  .calc-tab{background:var(--paper); border:1px solid var(--line-strong); border-radius:999px; padding:.65em 1.3em; font-size:.86rem; font-weight:600; color:var(--ink-soft); cursor:pointer; font-family:"Public Sans",sans-serif;}
+  .calc-tab.active{background:var(--primary); color:#f7faf6; border-color:var(--primary);}
+  .calc-panel{display:none;}
+  .calc-panel.active{display:block;}
+  .calc-card{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:28px; box-shadow:var(--shadow); display:grid; grid-template-columns:1fr 1fr; gap:30px;}
+  .calc-head h3{font-size:1.05rem; margin:.1em 0 .3em;}
+  .calc-head p{font-size:.85rem;}
+  .calc-body{display:grid; gap:14px; align-content:start;}
+  .calc-field{display:flex; flex-direction:column; gap:.4em; font-size:.78rem; color:var(--muted); font-weight:600;}
+  .calc-input{display:flex; align-items:center; gap:.4em; border:1px solid var(--line-strong); border-radius:10px; padding:.6em .8em; background:var(--bg);}
+  .calc-input input{border:none; background:none; outline:none; width:100%; font-family:"IBM Plex Mono",monospace; font-size:1rem; color:var(--ink);}
+  .calc-input .prefix,.calc-input .suffix{font-family:"IBM Plex Mono",monospace; font-size:.82rem; color:var(--muted);}
+  .calc-results{display:flex; flex-direction:column; gap:10px;}
+  .calc-result{display:flex; justify-content:space-between; align-items:center; background:var(--primary-tint); border-radius:12px; padding:15px 18px; font-size:.83rem; color:var(--ink-soft);}
+  .calc-result strong{font-size:1.25rem; color:var(--primary); font-weight:600;}
+  :root[data-theme="dark"] .calc-result strong, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .calc-result strong{color:var(--primary-light);} }
+  .calc-fine{font-size:.7rem; color:var(--muted); margin:16px 0 0;}
+  @media (max-width:780px){.calc-card{grid-template-columns:1fr;}}
+
+  /* risk profile */
+  .risk-card{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:30px;}
+  .risk-q{padding:18px 0; border-bottom:1px solid var(--line);}
+  .risk-q:last-of-type{border-bottom:none;}
+  .risk-q p{font-weight:600; color:var(--ink); font-size:.92rem; margin-bottom:.7em;}
+  .risk-opts{display:grid; gap:8px;}
+  .risk-opt{display:flex; align-items:center; gap:.7em; font-size:.88rem; color:var(--ink-soft); cursor:pointer;}
+  .risk-opt input{accent-color:var(--primary);}
+  .risk-result{display:none; margin-top:22px; background:var(--primary-tint); border-radius:14px; padding:24px;}
+  .risk-result.show{display:block;}
+  .risk-result h3{font-size:1.1rem; margin-bottom:.3em;}
+  .risk-result p{font-size:.9rem; margin-bottom:.4em;}
+  .risk-fine{font-size:.76rem; color:var(--muted); margin-top:18px;}
+
+  /* trust seal + status table */
+  .seal-wrap{background:var(--ink); color:#eef3ee; border-radius:20px; padding:40px; display:grid; grid-template-columns:.4fr .6fr; gap:36px; align-items:center;}
+  :root[data-theme="dark"] .seal-wrap, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .seal-wrap{background:var(--paper-2); border:1px solid var(--line-strong);} }
+  .seal{width:158px;height:158px;border-radius:50%; border:1.5px dashed var(--accent); display:flex; align-items:center; justify-content:center; text-align:center; margin:0 auto; padding:16px;}
+  .seal .inner{font-family:"IBM Plex Mono",monospace; font-size:.64rem; letter-spacing:.05em; line-height:1.5; color:var(--accent-tint,#f3e2bf);}
+  .seal .inner b{display:block; font-size:.9rem; font-family:"Fraunces",serif; color:#fff; margin-bottom:.3em; letter-spacing:0;}
+  .seal-copy h3{color:#fff; font-size:1.25rem;}
+  .seal-copy p{color:#cdd9d0; font-size:.92rem;}
+  .fine{font-size:.76rem; color:#a9b8ac; max-width:64ch;}
+  @media (max-width:780px){.seal-wrap{grid-template-columns:1fr;} .seal{margin:0 auto;}}
+
+  .status-table{width:100%; border-collapse:collapse; margin-top:40px; font-size:.86rem;}
+  .status-table th{text-align:left; font-family:"IBM Plex Mono",monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; padding:0 14px 10px; border-bottom:1px solid var(--line-strong);}
+  .status-table td{padding:13px 14px; border-bottom:1px solid var(--line); vertical-align:top;}
+  .status-table tr:last-child td{border-bottom:none;}
+  .status-table td:first-child{font-weight:600; white-space:nowrap;}
+  .status-note{font-size:.84rem; margin-top:18px;}
+
+  .faq{border-top:1px solid var(--line-strong); max-width:820px;}
+  details{border-bottom:1px solid var(--line); padding:18px 0;}
+  summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1em; font-family:"Fraunces",serif; font-size:1rem; font-weight:600; color:var(--ink);}
+  summary::-webkit-details-marker{display:none;}
+  summary .plus{width:24px;height:24px; border-radius:50%; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; flex:none; position:relative;}
+  summary .plus::before, summary .plus::after{content:""; position:absolute; background:var(--ink-soft);}
+  summary .plus::before{width:9px;height:1.5px;}
+  summary .plus::after{width:1.5px;height:9px; transition:transform .18s ease;}
+  details[open] summary .plus::after{transform:rotate(90deg); opacity:0;}
+  details p{margin-top:12px; padding-right:2em; font-size:.92rem;}
+
+  .cta-band{background:linear-gradient(180deg, var(--primary), var(--primary-light)); color:#f4f8f4; border-radius:22px; padding:52px 40px; text-align:center;}
+  .cta-band h2{color:#fff; margin-bottom:.4em;}
+  .cta-band p{color:#d7e6dc; max-width:52ch; margin:0 auto 24px;}
+  .cta-band .cta-row{justify-content:center;}
+  .cta-band .store-badge{background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); color:#fff;}
+  .cta-band .btn-ghost{border-color:rgba(255,255,255,.45); color:#fff;}
+
+  footer{border-top:1px solid var(--line); background:var(--paper); padding:52px 0 26px;}
+  .foot-grid{display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:24px; padding-bottom:32px;}
+  .foot-brand p{font-size:.85rem; max-width:34ch;}
+  .foot-col h4{font-size:.76rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:1em;}
+  .foot-col a{display:block; font-size:.88rem; color:var(--ink-soft); text-decoration:none; margin-bottom:.65em;}
+  .foot-col a:hover{color:var(--primary);}
+  @media (max-width:820px){.foot-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.foot-grid{grid-template-columns:1fr;}}
+  .foot-legal{border-top:1px solid var(--line); padding-top:22px; font-size:.75rem; color:var(--muted); line-height:1.7;}
+  .foot-legal .row1{display:flex; justify-content:space-between; gap:1em; flex-wrap:wrap; margin-bottom:12px; font-family:"IBM Plex Mono",monospace; font-size:.7rem;}
+  ::selection{background:var(--accent-tint); color:var(--ink);}
+
+  .lang-toggle{display:flex; border:1px solid var(--line-strong); border-radius:999px; padding:3px; gap:2px;}
+  .lang-btn{background:none; border:none; border-radius:999px; padding:.4em .85em; font-family:"Public Sans",sans-serif; font-size:.78rem; font-weight:600; color:var(--ink-soft); cursor:pointer;}
+  .lang-btn.active{background:var(--primary); color:#f7faf6;}
+  @media (max-width:560px){.lang-btn{padding:.4em .6em;}}
+</style>
+
+<div class="strip">
+  <div class="wrap">
+    <span data-i18n="strip1">Nivesh Track, a brand of Cadence Finserve Pvt Ltd — AMFI-registered Mutual Fund Distributor</span>
+    <span class="fill" data-i18n="strip2">Mutual fund investments are subject to market risk. Read scheme documents carefully.</span>
+  </div>
+</div>
+
+<header>
+  <nav class="wrap">
+    <a class="logo" href="#top">
+      <span class="logo-mark" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 16 L10 9 L14 13 L20 5" stroke="#eef3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5H20V10" stroke="#eef3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Nivesh Track<span class="brand-tag" data-i18n="brand_tag">a brand of Cadence Finserve</span></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="navlinks" id="navLinks">
+      <div class="has-drop">
+        <button type="button" aria-expanded="false" data-i18n="nav_other">Other services <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="dropdown">
+          <a href="#other-services"><strong data-i18n="nav_pms_t">PMS</strong><span data-i18n="nav_pms_d">Managed portfolios</span></a>
+          <a href="#other-services"><strong data-i18n="nav_aif_t">AIF</strong><span data-i18n="nav_aif_d">Category I/II/III funds</span></a>
+          <a href="#other-services"><strong data-i18n="nav_sif_t">SIF</strong><span data-i18n="nav_sif_d">SEBI's mid-ticket category</span></a>
+          <a href="#other-services"><strong data-i18n="nav_ins_t">Insurance</strong><span data-i18n="nav_ins_d">Life, health &amp; general</span></a>
+          <a href="#other-services"><strong data-i18n="nav_tax_t">Tax Planning</strong><span data-i18n="nav_tax_d">General inputs</span></a>
+          <a href="#other-services"><strong data-i18n="nav_estate_t">Estate Planning</strong><span data-i18n="nav_estate_d">With a legal partner</span></a>
+          <a href="#other-services"><strong data-i18n="nav_gift_t">GIFT City Investing</strong><span data-i18n="nav_gift_d">Via a named partner</span></a>
+        </div>
+      </div>
+      <a href="#app" data-i18n="nav_app">The app</a>
+      <a href="#calculators" data-i18n="nav_calc">Calculators</a>
+      <div class="has-drop">
+        <button type="button" aria-expanded="false" data-i18n="nav_resources">Resources <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="dropdown single">
+          <a href="#risk-profile"><strong data-i18n="nav_risk_t">Risk profile</strong><span data-i18n="nav_risk_d">A 2-minute self-assessment</span></a>
+          <a href="#awareness"><strong data-i18n="nav_aware_t">Awareness sessions</strong><span data-i18n="nav_aware_d">For your organization</span></a>
+        </div>
+      </div>
+      <a href="#guidance" data-i18n="nav_rm">Relationship manager</a>
+      <a href="#trust" data-i18n="nav_trust">Trust &amp; compliance</a>
+      <a href="#faq" data-i18n="nav_faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" class="lang-btn active" data-lang="en">EN</button>
+        <button type="button" class="lang-btn" data-lang="hi">हिं</button>
+      </div>
+      <a class="btn btn-primary" href="#app" data-i18n="nav_getapp">Get the app</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow" data-i18n="hero_eyebrow">Mutual funds, the easy way</p>
+        <h1 data-i18n="hero_h1">Start your SIP from home — track every rupee of it in one ledger.</h1>
+        <p class="lede" data-i18n="hero_lede">Nivesh Track, a brand of Cadence Finserve Private Limited, has been an AMFI-registered Mutual Fund Distributor since 2019 (ARN-165724). Beyond mutual funds, we also connect you to PMS, AIF, SIF, insurance, tax planning, estate planning and GIFT City investing through our relationship managers and partners.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#app" data-i18n="hero_cta1">Start your SIP</a>
+          <a class="btn btn-ghost" href="#other-services" data-i18n="hero_cta2">See other services</a>
+        </div>
+        <p class="hero-note"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke-width="1.6"/></svg> <span data-i18n="hero_note">New to investing? Complete KYC and your first SIP from the app — no branch visit needed.</span></p>
+      </div>
+      <div class="passbook" aria-hidden="true">
+        <div class="passbook-head"><div class="b1" data-i18n="pb_b1">Nivesh Track<br>Mutual Fund Passbook</div><div class="b2" data-i18n="pb_b2">A/C TYPE<br>SIP &amp; LUMPSUM</div></div>
+        <div class="prow"><div class="desc"><strong data-i18n="pb_r1_t">SIP — Flexicap Fund</strong><span data-i18n="pb_r1_d">Monthly · Self-selected</span></div><div class="amt" data-i18n="pb_tracked">↑ tracked</div></div>
+        <div class="prow"><div class="desc"><strong data-i18n="pb_r2_t">SIP — ELSS Fund</strong><span data-i18n="pb_r2_d">Monthly · Tax-saving</span></div><div class="amt" data-i18n="pb_tracked">↑ tracked</div></div>
+        <div class="prow"><div class="desc"><strong data-i18n="pb_r3_t">Lumpsum — Debt Fund</strong><span data-i18n="pb_r3_d">One-time</span></div><div class="amt" data-i18n="pb_tracked">↑ tracked</div></div>
+        <div class="prow"><div class="desc"><strong data-i18n="pb_r4_t">SIP — Index Fund</strong><span data-i18n="pb_r4_d">Monthly · From our shortlist</span></div><div class="amt" data-i18n="pb_tracked">↑ tracked</div></div>
+        <div class="passbook-foot"><span><span class="dot"></span><span data-i18n="pb_illustrative">Illustrative view</span></span><span data-i18n="pb_updated">Updated automatically</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="facts">
+    <div class="wrap">
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke-width="1.6"/></svg><div><strong data-i18n="fact1_t">AMFI-registered MFD</strong><span data-i18n="fact1_d">ARN-165724 · Est. 2019</span></div></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17l6-6 4 4 7-7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h5v5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><strong data-i18n="fact_aum_t">1,900+ families · ~₹500 Cr AUM</strong><span data-i18n="fact_aum_d">Tracked across our investors</span></div></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke-width="1.6"/><path d="M5 20c1.5-4 4.5-6 7-6s5.5 2 7 6" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong data-i18n="fact2_t">A named relationship manager</strong><span data-i18n="fact2_d">One contact, every service line</span></div></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11l18-7-7 18-2.5-7.5L3 11z" stroke-width="1.5" stroke-linejoin="round"/></svg><div><strong data-i18n="fact3_t">Free awareness sessions</strong><span><a href="#awareness" style="color:inherit; text-decoration:underline;" data-i18n="fact3_d">For organizations &amp; teams</a></span></div></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke-width="1.6"/><path d="M9 12h6M12 9v6" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>Nivesh Track</strong><span data-i18n="fact4_d">A brand of Cadence Finserve Pvt Ltd</span></div></div>
+    </div>
+  </div>
+
+  <div class="band-paper">
+    <section id="app">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="app_eyebrow">Start here — the Nivesh Track app</p>
+          <h2 data-i18n="app_h2">Your mutual fund journey, starting from zero paperwork.</h2>
+          <p data-i18n="app_intro">Nivesh Track is built to make mutual fund investing smooth, right from your phone. Complete your KYC and place your first SIP in a few minutes, end to end on the Nivesh Track platform — no branch visit, no paper forms.</p>
+        </div>
+        <div class="ledger">
+          <div class="lentry"><div class="idx num">01</div><div><h3 data-i18n="app_l1_t">Self-serve KYC &amp; onboarding</h3><p data-i18n="app_l1_d">Complete KYC digitally on the Nivesh Track platform — in a few minutes, from anywhere.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="lentry"><div class="idx num">02</div><div><h3 data-i18n="app_l2_t">Pick your own scheme, or start from our shortlist</h3><p data-i18n="app_l2_d">Search and choose independently, or start from a shortlist curated by our investment research desk — the decision is always yours.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="lentry"><div class="idx num">03</div><div><h3 data-i18n="app_l3_t">Consolidated portfolio view</h3><p data-i18n="app_l3_d">Every scheme, folio and SIP across fund houses in one running account.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="lentry"><div class="idx num">04</div><div><h3 data-i18n="app_l4_t">Systematic reports</h3><p data-i18n="app_l4_d">Pull statements and performance reports on your own schedule.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="lentry"><div class="idx num">05</div><div><h3 data-i18n="app_l5_t">Goal tracking</h3><p data-i18n="app_l5_d">Tag investments to a goal and watch progress against it specifically.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="lentry"><div class="idx num">06</div><div><h3 data-i18n="app_l6_t">Start and manage SIPs</h3><p data-i18n="app_l6_d">New SIPs and one-time purchases, right from the app.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="lentry"><div class="idx num">07</div><div><h3 data-i18n="app_l7_t">A named relationship manager</h3><p data-i18n="app_l7_d">One person at Nivesh Track for onboarding, SIP changes and goal-based guidance.</p></div><div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        </div>
+        <div class="store-row" style="margin-top:30px;">
+          <a class="store-badge" href="https://apps.apple.com/in/app/nivesh-track/id6744318014" target="_blank" rel="noopener">
+            <svg viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141 8 184.8 8 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-65.7-90-65.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+            <span class="txt"><small>Download on the</small><strong>App Store</strong></span>
+          </a>
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.niveshtrack.niveshtrack&amp;hl=en_IN" target="_blank" rel="noopener">
+            <svg viewBox="0 0 512 512" fill="currentColor"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60-34.1c17.8-11.1 17.8-49.7-1.1-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+            <span class="txt"><small>GET IT ON</small><strong>Google Play</strong></span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head"><p class="eyebrow" data-i18n="steps_eyebrow">Getting started</p><h2 data-i18n="steps_h2">Four entries to your first SIP.</h2></div>
+      <div class="steps">
+        <div class="step"><div class="idx" data-i18n="step1_idx">ENTRY 01</div><h3 data-i18n="step1_t">Download &amp; register</h3><p data-i18n="step1_d">Get the app and sign up with your PAN and mobile number.</p></div>
+        <div class="step"><div class="idx" data-i18n="step2_idx">ENTRY 02</div><h3 data-i18n="step2_t">Complete self-serve e-KYC</h3><p data-i18n="step2_d">Verify identity digitally on our onboarding platform, in line with SEBI KYC norms.</p></div>
+        <div class="step"><div class="idx" data-i18n="step3_idx">ENTRY 03</div><h3 data-i18n="step3_t">Explore &amp; invest</h3><p data-i18n="step3_d">Pick a scheme yourself, or start from our shortlist, then start a SIP.</p></div>
+        <div class="step"><div class="idx" data-i18n="step4_idx">ENTRY 04</div><h3 data-i18n="step4_t">Track in one place</h3><p data-i18n="step4_d">Your passbook updates as transactions settle.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band-paper">
+    <section id="other-services">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="os_eyebrow">Beyond mutual funds</p>
+          <h2 data-i18n="os_h2">The rest of your financial life — one message away.</h2>
+          <p data-i18n="os_intro">We're primarily a mutual fund distributor. For these, we connect you with the right registered partner or specialist — leave your details below and a relationship manager will reach out.</p>
+        </div>
+        <div class="svc-grid">
+          <div class="svc-card"><span class="svc-idx num">01</span><h3 data-i18n="svc1_t">PMS</h3><p data-i18n="svc1_d">Professionally managed, concentrated portfolios for investors past the mutual fund ticket size.</p></div>
+          <div class="svc-card"><span class="svc-idx num">02</span><h3 data-i18n="svc2_t">AIF</h3><p data-i18n="svc2_d">Category I, II and III alternative investment funds, placed with empanelled fund managers.</p></div>
+          <div class="svc-card"><span class="svc-idx num">03</span><h3 data-i18n="svc3_t">SIF</h3><p data-i18n="svc3_d">SEBI's newer category between mutual funds and PMS — ₹10 lakh minimum.</p></div>
+          <div class="svc-card"><span class="svc-idx num">04</span><h3 data-i18n="svc4_t">Insurance</h3><p data-i18n="svc4_d">Life, health and general cover, placed with our registered insurer panel.</p></div>
+          <div class="svc-card"><span class="svc-idx num">05</span><h3 data-i18n="svc5_t">Tax Planning</h3><p data-i18n="svc5_d">General tax-planning inputs alongside your investments — not a substitute for your CA.</p></div>
+          <div class="svc-card"><span class="svc-idx num">06</span><h3 data-i18n="svc6_t">Estate Planning</h3><p data-i18n="svc6_d">Structuring how your assets pass on, with a licensed legal partner.</p></div>
+          <div class="svc-card"><span class="svc-idx num">07</span><h3 data-i18n="svc7_t">GIFT City Investing</h3><p data-i18n="svc7_d">Global market access via GIFT City's IFSC, through a named partner.</p></div>
+        </div>
+        <div class="devnote">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 16.5h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p><strong data-i18n="os_devnote_s">Draft-stage note, not for the public site:</strong> <span data-i18n="os_devnote_p">this form currently just opens an email with the details filled in — it has no backend or CRM wiring yet. Registration details for each product (APRN, insurer panel, IFSCA partner, etc.) are intentionally kept off these cards and consolidated in Trust &amp; compliance below instead.</span></p>
+        </div>
+        <div class="lead-wrap">
+          <h3 data-i18n="lf_h3">Interested in one of these?</h3>
+          <p data-i18n="lf_p">Leave your email and mobile number with the product you're after — a relationship manager will get in touch to take it further.</p>
+          <form class="form-grid" id="leadForm">
+            <div class="form-row three">
+              <label class="form-field"><span data-i18n="f_name">Name</span><input type="text" name="name" required></label>
+              <label class="form-field"><span data-i18n="f_email">Email</span><input type="email" name="email" required></label>
+              <label class="form-field"><span data-i18n="f_mobile">Mobile</span><input type="tel" name="mobile" required></label>
+            </div>
+            <label class="form-field"><span data-i18n="lf_product_label">Which product?</span>
+              <select name="product" required>
+                <option value="" data-i18n="lf_opt_select">Select one</option>
+                <option data-i18n="nav_pms_t">PMS</option>
+                <option data-i18n="nav_aif_t">AIF</option>
+                <option data-i18n="nav_sif_t">SIF</option>
+                <option data-i18n="nav_ins_t">Insurance</option>
+                <option data-i18n="nav_tax_t">Tax Planning</option>
+                <option data-i18n="nav_estate_t">Estate Planning</option>
+                <option data-i18n="nav_gift_t">GIFT City Investing</option>
+                <option data-i18n="lf_opt_notsure">Not sure yet</option>
+              </select>
+            </label>
+            <label class="form-field"><span data-i18n="lf_message_label">Anything else to add? (optional)</span><textarea name="message" rows="3"></textarea></label>
+            <button type="submit" class="btn btn-primary" style="justify-self:start;" data-i18n="f_request_callback">Request a callback</button>
+            <p class="form-fine" data-i18n="lf_fine">We'll only use these details to get in touch about the product you've chosen.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="guidance">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="gd_eyebrow">Service model</p>
+        <h2 data-i18n="gd_h2">A relationship manager, not just an app.</h2>
+        <p data-i18n="gd_intro">Every client is assigned one relationship manager at Nivesh Track — a single point of contact across every service line, instead of a rotating support queue.</p>
+      </div>
+      <div class="guidance-grid">
+        <div class="guidance-copy">
+          <h3 data-i18n="gd_h3">Goal-based guidance, kept within the rules</h3>
+          <p data-i18n="gd_p1">For mutual funds specifically, Nivesh Track is permitted to offer what SEBI's framework calls <em>incidental advice</em> — basic, goal-based guidance limited to the schemes we distribute, built on your goal, horizon and risk comfort. You can always choose a scheme yourself; the shortlist from our investment research desk is a starting point, not a requirement.</p>
+          <p data-i18n="gd_p2">For PMS, AIF, SIF, insurance, tax and estate planning, your relationship manager's role is to connect you with the specifically registered specialist or partner for that product — not to extend mutual-fund-style guidance into products that sit under a different regulator entirely.</p>
+        </div>
+        <div class="guidance-ctas">
+          <a class="mini" href="#calculators"><span><strong data-i18n="gcta1_t">Run the numbers</strong><span data-i18n="gcta1_d">Goal, retirement, step-up &amp; SWP calculators</span></span><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="mini" href="#risk-profile"><span><strong data-i18n="gcta2_t">Know your risk profile</strong><span data-i18n="gcta2_d">A 2-minute self-assessment</span></span><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="callback-box">
+            <strong data-i18n="cb_title">Request a callback</strong>
+            <p data-i18n="cb_p">Leave your number and a relationship manager will call you back.</p>
+            <form class="form-grid" id="callbackForm">
+              <label class="form-field"><span data-i18n="f_name">Name</span><input type="text" name="name" required></label>
+              <label class="form-field"><span data-i18n="cb_mobile_label">Mobile number</span><input type="tel" name="mobile" required></label>
+              <label class="form-field"><span data-i18n="cb_time_label">Preferred time to call</span><input type="text" name="preferred_time" placeholder="e.g. weekdays after 6pm" data-i18n-ph="cb_time_ph" required></label>
+              <button type="submit" class="btn btn-primary btn-sm" style="justify-self:start;" data-i18n="f_request_callback">Request a callback</button>
+              <p class="form-fine" data-i18n="cb_fine">Draft note: no backend wired up yet — this currently opens a pre-filled email.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band-paper">
+    <section id="calculators">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="calc_eyebrow">Plan the numbers</p>
+          <h2 data-i18n="calc_h2">Four calculators, the ones you'll actually use.</h2>
+          <p data-i18n="calc_intro">Every output here is illustrative — based on the numbers and return assumption you enter, not a promise from Nivesh Track. Mutual fund investments are subject to market risk.</p>
+        </div>
+        <div class="calc-tabs">
+          <button class="calc-tab active" data-tab="goal" data-i18n="tab_goal">Goal SIP</button>
+          <button class="calc-tab" data-tab="retire" data-i18n="tab_retire">Retirement</button>
+          <button class="calc-tab" data-tab="stepup" data-i18n="tab_stepup">Step-up SIP</button>
+          <button class="calc-tab" data-tab="swp" data-i18n="tab_swp">SWP</button>
+        </div>
+
+        <div class="calc-panel active" id="panel-goal">
+          <div class="calc-card">
+            <div class="calc-body">
+              <div class="calc-head"><h3 data-i18n="goal_h3">What would it take to reach a goal?</h3><p data-i18n="goal_p">A starting point for the conversation with your relationship manager.</p></div>
+              <label class="calc-field"><span data-i18n="goal_amount">Goal amount</span><div class="calc-input"><span class="prefix">₹</span><input type="number" id="g_amount" value="1000000" min="1000" step="1000"></div></label>
+              <label class="calc-field"><span data-i18n="goal_years">Time to goal</span><div class="calc-input"><input type="number" id="g_years" value="10" min="1" max="40" step="1"><span class="suffix" data-i18n="u_years">years</span></div></label>
+              <label class="calc-field"><span data-i18n="calc_return">Assumed annual return</span><div class="calc-input"><input type="number" id="g_return" value="10" min="1" max="20" step="0.5"><span class="suffix">%</span></div></label>
+            </div>
+            <div class="calc-results">
+              <div class="calc-result"><span data-i18n="goal_result_label">Estimated monthly SIP needed</span><strong id="g_out" class="num">₹ 4,842</strong></div>
+              <p class="calc-fine" data-i18n="calc_fine_a">Illustrative only, based on the return you enter — not a return Nivesh Track offers, guarantees or expects.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-panel" id="panel-retire">
+          <div class="calc-card">
+            <div class="calc-body">
+              <div class="calc-head"><h3 data-i18n="retire_h3">What will retirement cost, and what SIP gets you there?</h3><p data-i18n="retire_p">Assumes your expenses keep pace with inflation through retirement.</p></div>
+              <label class="calc-field"><span data-i18n="retire_age">Current age</span><div class="calc-input"><input type="number" id="r_age" value="30" min="18" max="65" step="1"><span class="suffix" data-i18n="u_yrs">yrs</span></div></label>
+              <label class="calc-field"><span data-i18n="retire_retireage">Retirement age</span><div class="calc-input"><input type="number" id="r_retireAge" value="60" min="40" max="75" step="1"><span class="suffix" data-i18n="u_yrs">yrs</span></div></label>
+              <label class="calc-field"><span data-i18n="retire_expense">Monthly expense today</span><div class="calc-input"><span class="prefix">₹</span><input type="number" id="r_expense" value="40000" min="1000" step="1000"></div></label>
+              <label class="calc-field"><span data-i18n="retire_postyears">Years in retirement</span><div class="calc-input"><input type="number" id="r_postYears" value="25" min="5" max="45" step="1"><span class="suffix" data-i18n="u_yrs">yrs</span></div></label>
+              <label class="calc-field"><span data-i18n="retire_inflation">Inflation</span><div class="calc-input"><input type="number" id="r_inflation" value="6" min="0" max="12" step="0.5"><span class="suffix">%</span></div></label>
+              <label class="calc-field"><span data-i18n="retire_prepost">Return before / after retirement</span><div class="calc-input"><input type="number" id="r_preReturn" value="11" min="1" max="20" step="0.5"><span class="suffix">% / </span><input type="number" id="r_postReturn" value="7" min="1" max="15" step="0.5"><span class="suffix">%</span></div></label>
+            </div>
+            <div class="calc-results">
+              <div class="calc-result"><span data-i18n="retire_corpus_label">Corpus required at retirement</span><strong id="r_corpus" class="num">—</strong></div>
+              <div class="calc-result"><span data-i18n="retire_sip_label">Monthly SIP needed today</span><strong id="r_sip" class="num">—</strong></div>
+              <p class="calc-fine" data-i18n="retire_fine">Illustrative only. Actual inflation and returns will differ, and this doesn't account for existing savings or EPF/NPS balances.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-panel" id="panel-stepup">
+          <div class="calc-card">
+            <div class="calc-body">
+              <div class="calc-head"><h3 data-i18n="stepup_h3">What if your SIP grows every year?</h3><p data-i18n="stepup_p">Models a fixed annual increase to your monthly SIP.</p></div>
+              <label class="calc-field"><span data-i18n="stepup_start">Starting monthly SIP</span><div class="calc-input"><span class="prefix">₹</span><input type="number" id="s_sip" value="10000" min="500" step="500"></div></label>
+              <label class="calc-field"><span data-i18n="stepup_annual">Annual step-up</span><div class="calc-input"><input type="number" id="s_stepup" value="10" min="0" max="50" step="1"><span class="suffix">%</span></div></label>
+              <label class="calc-field"><span data-i18n="stepup_duration">Duration</span><div class="calc-input"><input type="number" id="s_years" value="15" min="1" max="40" step="1"><span class="suffix" data-i18n="u_years">years</span></div></label>
+              <label class="calc-field"><span data-i18n="calc_return">Assumed annual return</span><div class="calc-input"><input type="number" id="s_return" value="11" min="1" max="20" step="0.5"><span class="suffix">%</span></div></label>
+            </div>
+            <div class="calc-results">
+              <div class="calc-result"><span data-i18n="stepup_invested_label">Total invested</span><strong id="s_invested" class="num">—</strong></div>
+              <div class="calc-result"><span data-i18n="stepup_value_label">Estimated value</span><strong id="s_value" class="num">—</strong></div>
+              <p class="calc-fine" data-i18n="calc_fine_a">Illustrative only, based on the return you enter — not a return Nivesh Track offers, guarantees or expects.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-panel" id="panel-swp">
+          <div class="calc-card">
+            <div class="calc-body">
+              <div class="calc-head"><h3 data-i18n="swp_h3">How long will a withdrawal plan last?</h3><p data-i18n="swp_p">For a lumpsum you're drawing a fixed amount from each month.</p></div>
+              <label class="calc-field"><span data-i18n="swp_corpus">Starting corpus</span><div class="calc-input"><span class="prefix">₹</span><input type="number" id="w_corpus" value="5000000" min="10000" step="10000"></div></label>
+              <label class="calc-field"><span data-i18n="swp_withdraw">Monthly withdrawal</span><div class="calc-input"><span class="prefix">₹</span><input type="number" id="w_withdraw" value="30000" min="500" step="500"></div></label>
+              <label class="calc-field"><span data-i18n="calc_return">Assumed annual return</span><div class="calc-input"><input type="number" id="w_return" value="7" min="0" max="20" step="0.5"><span class="suffix">%</span></div></label>
+            </div>
+            <div class="calc-results">
+              <div class="calc-result"><span data-i18n="swp_result_label">Your corpus lasts approximately</span><strong id="w_out" class="num">—</strong></div>
+              <p class="calc-fine" data-i18n="swp_fine">Illustrative only. Market swings mean actual returns are never a flat monthly rate the way this estimate assumes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="risk-profile">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="risk_eyebrow">Know yourself first</p>
+        <h2 data-i18n="risk_h2">What kind of investor are you?</h2>
+        <p data-i18n="risk_intro">A two-minute self-assessment — not a substitute for the fuller risk-profiling your relationship manager will do as part of onboarding, in line with SEBI's KYC norms.</p>
+      </div>
+      <div class="risk-card">
+        <form id="riskForm">
+          <div class="risk-q">
+            <p data-i18n="q1_t">1. Your age bracket</p>
+            <div class="risk-opts">
+              <label class="risk-opt"><input type="radio" name="q1" value="4"><span data-i18n="q1_o1">Under 30</span></label>
+              <label class="risk-opt"><input type="radio" name="q1" value="3"><span data-i18n="q1_o2">30–45</span></label>
+              <label class="risk-opt"><input type="radio" name="q1" value="2"><span data-i18n="q1_o3">46–55</span></label>
+              <label class="risk-opt"><input type="radio" name="q1" value="1"><span data-i18n="q1_o4">Above 55</span></label>
+            </div>
+          </div>
+          <div class="risk-q">
+            <p data-i18n="q2_t">2. How long before you'll likely need this money?</p>
+            <div class="risk-opts">
+              <label class="risk-opt"><input type="radio" name="q2" value="1"><span data-i18n="q2_o1">Under 1 year</span></label>
+              <label class="risk-opt"><input type="radio" name="q2" value="2"><span data-i18n="q2_o2">1–3 years</span></label>
+              <label class="risk-opt"><input type="radio" name="q2" value="3"><span data-i18n="q2_o3">3–7 years</span></label>
+              <label class="risk-opt"><input type="radio" name="q2" value="4"><span data-i18n="q2_o4">7+ years</span></label>
+            </div>
+          </div>
+          <div class="risk-q">
+            <p data-i18n="q3_t">3. Your portfolio drops 20% in a month. You:</p>
+            <div class="risk-opts">
+              <label class="risk-opt"><input type="radio" name="q3" value="1"><span data-i18n="q3_o1">Sell everything</span></label>
+              <label class="risk-opt"><input type="radio" name="q3" value="2"><span data-i18n="q3_o2">Sell some, to be safe</span></label>
+              <label class="risk-opt"><input type="radio" name="q3" value="3"><span data-i18n="q3_o3">Do nothing, wait it out</span></label>
+              <label class="risk-opt"><input type="radio" name="q3" value="4"><span data-i18n="q3_o4">Invest more while it's down</span></label>
+            </div>
+          </div>
+          <div class="risk-q">
+            <p data-i18n="q4_t">4. Your main goal with this money</p>
+            <div class="risk-opts">
+              <label class="risk-opt"><input type="radio" name="q4" value="1"><span data-i18n="q4_o1">Protect what I have</span></label>
+              <label class="risk-opt"><input type="radio" name="q4" value="2"><span data-i18n="q4_o2">A regular income</span></label>
+              <label class="risk-opt"><input type="radio" name="q4" value="3"><span data-i18n="q4_o3">Balanced growth</span></label>
+              <label class="risk-opt"><input type="radio" name="q4" value="4"><span data-i18n="q4_o4">Maximum long-term growth</span></label>
+            </div>
+          </div>
+          <div class="risk-q">
+            <p data-i18n="q5_t">5. Your investing experience so far</p>
+            <div class="risk-opts">
+              <label class="risk-opt"><input type="radio" name="q5" value="1"><span data-i18n="q5_o1">None</span></label>
+              <label class="risk-opt"><input type="radio" name="q5" value="2"><span data-i18n="q5_o2">Some — mutual funds or FDs</span></label>
+              <label class="risk-opt"><input type="radio" name="q5" value="3"><span data-i18n="q5_o3">Moderate — direct equities too</span></label>
+              <label class="risk-opt"><input type="radio" name="q5" value="4"><span data-i18n="q5_o4">Experienced across several asset classes</span></label>
+            </div>
+          </div>
+          <div class="risk-q">
+            <p data-i18n="q6_t">6. Your income stability</p>
+            <div class="risk-opts">
+              <label class="risk-opt"><input type="radio" name="q6" value="1"><span data-i18n="q6_o1">Irregular / uncertain</span></label>
+              <label class="risk-opt"><input type="radio" name="q6" value="2"><span data-i18n="q6_o2">Stable, single source</span></label>
+              <label class="risk-opt"><input type="radio" name="q6" value="3"><span data-i18n="q6_o3">Stable, multiple sources</span></label>
+              <label class="risk-opt"><input type="radio" name="q6" value="4"><span data-i18n="q6_o4">Very stable, with surplus</span></label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:8px;" data-i18n="risk_btn">See my risk profile</button>
+        </form>
+        <div class="risk-result" id="riskResult">
+          <h3 id="riskTitle"></h3>
+          <p id="riskDesc"></p>
+          <a class="btn btn-ghost btn-sm" href="#guidance" data-i18n="risk_cta">Request a callback about this</a>
+          <p class="risk-fine" data-i18n="risk_fine">This is a general self-assessment, not personalised advice. Your relationship manager will carry out fuller risk-profiling as part of onboarding.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band-paper">
+    <section id="awareness">
+      <div class="wrap">
+        <div class="section-head"><p class="eyebrow" data-i18n="aw_eyebrow">For organizations &amp; teams</p><h2 data-i18n="aw_h2">Bring an investor awareness session to your people.</h2></div>
+        <div class="devnote">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 16.5h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p><strong data-i18n="aw_devnote_s">Draft-stage note, not for the public site:</strong> <span data-i18n="aw_devnote_p">this form currently just opens an email with the details filled in — it has no backend. Wire it to your CRM or inbox of choice before launch.</span></p>
+        </div>
+        <div class="lead-wrap">
+          <h3 data-i18n="aw_h3">Free, independent of any sale</h3>
+          <p data-i18n="aw_p">We run free investor awareness sessions for organizations, employee groups and community bodies, delivered by a qualified financial expert from our team. These sessions are general education — not a personalised portfolio review, and run independently of any investment, insurance or other product sale.</p>
+          <form class="form-grid" id="awarenessForm">
+            <div class="form-row">
+              <label class="form-field"><span data-i18n="aw_org">Organization name</span><input type="text" name="organization" required></label>
+              <label class="form-field"><span data-i18n="aw_contact">Contact person</span><input type="text" name="contact_name" required></label>
+            </div>
+            <div class="form-row">
+              <label class="form-field"><span data-i18n="f_email">Email</span><input type="email" name="email" required></label>
+              <label class="form-field"><span data-i18n="aw_phone">Phone</span><input type="tel" name="phone" required></label>
+            </div>
+            <div class="form-row">
+              <label class="form-field"><span data-i18n="aw_city">City</span><input type="text" name="city"></label>
+              <label class="form-field"><span data-i18n="aw_groupsize">Approx. group size</span><input type="text" name="group_size" placeholder="e.g. 40 employees" data-i18n-ph="aw_groupsize_ph"></label>
+            </div>
+            <label class="form-field"><span data-i18n="aw_message_label">What would you like covered?</span><textarea name="message" rows="3" placeholder="e.g. mutual fund basics for new employees" data-i18n-ph="aw_message_ph"></textarea></label>
+            <button type="submit" class="btn btn-primary" style="justify-self:start;" data-i18n="aw_submit">Request a session</button>
+            <p class="form-fine" data-i18n="aw_fine">We'll only use these details to get in touch about scheduling your session.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="trust">
+    <div class="wrap">
+      <div class="seal-wrap">
+        <div class="seal"><div class="inner"><b>Nivesh Track</b><span data-i18n="seal_detail">Est. 2019<br>AMFI-Regd. MFD<br>ARN-165724</span></div></div>
+        <div class="seal-copy">
+          <p class="eyebrow" style="color:#f3e2bf" data-i18n="trust_eyebrow">Trust &amp; compliance</p>
+          <h3 data-i18n="trust_h3">Nivesh Track distributes. It does not advise.</h3>
+          <p data-i18n="trust_p1">Nivesh Track, a brand of Cadence Finserve Private Limited, has been an AMFI-registered Mutual Fund Distributor since 2019 — ARN-165724. Today we serve over 1,900 investor families, with approximately ₹500 crore tracked across client portfolios. We are purely a distributor of mutual funds and earn our commission as a product distributor from Asset Management Companies; we are not a SEBI-registered Investment Adviser. For PMS, AIF, SIF, insurance, tax planning, estate planning and GIFT City investing, we connect you with specifically registered partners and do not charge any separate fee for making that connection.</p>
+          <p class="fine" data-i18n="trust_fine">Mutual fund investments are subject to market risks. The NAVs of the schemes may go up or down depending on the factors and forces affecting the securities market, including fluctuations in interest rates. Please read all scheme-related documents carefully before investing, including the Scheme Information Document and Key Information Memorandum. Past performance is not indicative of future returns.</p>
+        </div>
+      </div>
+      <table class="status-table">
+        <thead><tr><th data-i18n="status_th1">Service / partner</th><th data-i18n="status_th2">Regulator</th><th data-i18n="status_th3">Status</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="nav_app">Mutual Fund</td><td>AMFI</td><td><span class="badge badge-ok" data-i18n="status_mf">ARN-165724 — confirmed</span></td></tr>
+          <tr><td data-i18n="nav_pms_t">PMS</td><td>APMI</td><td><span class="badge badge-warn" data-i18n="status_pms">APRN &amp; providers needed</span></td></tr>
+          <tr><td data-i18n="nav_aif_t">AIF</td><td data-i18n="status_aif_reg">Per fund manager</td><td><span class="badge badge-warn" data-i18n="status_aif">Empanelment list needed</span></td></tr>
+          <tr><td data-i18n="nav_sif_t">SIF</td><td data-i18n="status_sif_reg">SEBI (SIF framework)</td><td><span class="badge badge-warn" data-i18n="status_sif">Certification needs confirming</span></td></tr>
+          <tr><td data-i18n="nav_ins_t">Insurance</td><td>IRDAI</td><td><span class="badge badge-warn" data-i18n="status_ins">Reg. type, number &amp; panel needed</span></td></tr>
+          <tr><td data-i18n="nav_tax_t">Tax Planning</td><td data-i18n="status_tax_reg">— (CA-delivered)</td><td><span class="badge badge-warn" data-i18n="status_tax">Delivery model needs confirming</span></td></tr>
+          <tr><td data-i18n="nav_estate_t">Estate Planning</td><td data-i18n="status_estate_reg">— (legal partner)</td><td><span class="badge badge-warn" data-i18n="status_estate">Partner name needed</span></td></tr>
+          <tr><td data-i18n="nav_gift_t">GIFT City Investing</td><td>IFSCA</td><td><span class="badge badge-warn" data-i18n="status_gift">Partner entity needed</span></td></tr>
+        </tbody>
+      </table>
+      <p class="status-note" data-i18n="status_note">A category-wise breakdown of the commission we receive from AMCs is available on request — write to <a href="mailto:niveshtrack@gmail.com" style="text-decoration:underline;">niveshtrack@gmail.com</a> for the current schedule.</p>
+    </div>
+  </section>
+
+  <div class="band-paper">
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head"><p class="eyebrow" data-i18n="faq_eyebrow">Questions</p><h2 data-i18n="faq_h2">Before you get in touch.</h2></div>
+        <div class="faq">
+          <details open>
+            <summary><span data-i18n="faq1_q">Is Nivesh Track a financial advisor?</span><span class="plus"></span></summary>
+            <p data-i18n="faq1_a">No. Nivesh Track, a brand of Cadence Finserve Private Limited, is registered with AMFI as a Mutual Fund Distributor (ARN-165724), not as a SEBI Investment Adviser. For mutual funds, your relationship manager can offer basic, goal-based guidance incidental to distribution. For PMS, AIF, SIF, insurance, tax and estate planning, we connect you with the specifically registered specialist for that product.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq2_q">Do I have to be an existing client to use the app?</span><span class="plus"></span></summary>
+            <p data-i18n="faq2_a">No. The app is built to make mutual fund investing smooth for everyone — you can complete KYC and start your first SIP directly from the app.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq3_q">Can I choose my own mutual fund scheme?</span><span class="plus"></span></summary>
+            <p data-i18n="faq3_a">Yes. You can research and select any scheme yourself, or start from a shortlist curated by our investment research desk if you'd like a starting point — either way, the final choice is yours.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq4_q">What's the difference between a distributor and an RIA?</span><span class="plus"></span></summary>
+            <p data-i18n="faq4_a">A distributor (what we are, for mutual funds) earns a commission from the AMC and can offer basic guidance limited to the schemes it distributes. A Registered Investment Adviser charges a fee directly and can give comprehensive, personalised financial planning. We're the former.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq5_q">What is SIF, and who can invest?</span><span class="plus"></span></summary>
+            <p data-i18n="faq5_a">Specialised Investment Funds are SEBI's newer category sitting between mutual funds and PMS, with a ₹10 lakh minimum investment. They're built for investors who want more flexibility than a standard mutual fund but aren't at PMS ticket sizes yet.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq6_q">What is GIFT City investing?</span><span class="plus"></span></summary>
+            <p data-i18n="faq6_a">A route to global markets — US stocks, global ETFs, offshore funds — through GIFT City's International Financial Services Centre, accessed via the RBI's Liberalised Remittance Scheme (up to $250,000/year). It's regulated by IFSCA, not SEBI, so we offer it only through a named, IFSCA-registered partner.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq7_q">Is my insurance or investment amount guaranteed by Nivesh Track?</span><span class="plus"></span></summary>
+            <p data-i18n="faq7_a">No. Mutual fund, PMS, AIF and SIF values move with the market and are not guaranteed by Nivesh Track. Insurance cover is underwritten by the insurer on our panel, not by Nivesh Track.</p>
+          </details>
+          <details>
+            <summary><span data-i18n="faq8_q">Can I pause or stop a SIP from the app?</span><span class="plus"></span></summary>
+            <p data-i18n="faq8_a">SIP modification requests are routed through your relationship manager — reach out through the app's support option or the contact details below.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="cta-band">
+        <p class="eyebrow" style="color:#e7d9b3" data-i18n="ctaband_eyebrow">Ready when you are</p>
+        <h2 data-i18n="ctaband_h2">One relationship manager. Every service line.</h2>
+        <p data-i18n="ctaband_p">Free to download, free to ask. KYC takes a few minutes — your relationship manager handles the rest.</p>
+        <div class="cta-row">
+          <a class="btn btn-ghost" href="#guidance" data-i18n="cb_title">Request a callback</a>
+          <a class="btn btn-primary" href="#app" data-i18n="nav_getapp">Get the app</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 16 L10 9 L14 13 L20 5" stroke="#eef3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5H20V10" stroke="#eef3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Nivesh Track</a>
+        <p style="margin-top:14px;" data-i18n="foot_brand_p">Nivesh Track is a brand of Cadence Finserve Private Limited, an AMFI-registered Mutual Fund Distributor since 2019.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot_services_h4">Services</h4>
+        <a href="#app" data-i18n="foot_mf">Mutual Fund &amp; SIP</a><a href="#other-services" data-i18n="foot_pmsaif">PMS &amp; AIF</a><a href="#other-services" data-i18n="nav_sif_t">SIF</a><a href="#other-services" data-i18n="nav_ins_t">Insurance</a><a href="#other-services" data-i18n="foot_taxestate">Tax &amp; estate planning</a><a href="#other-services" data-i18n="nav_gift_t">GIFT City Investing</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot_calc_h4">Calculators</h4>
+        <a href="#calculators" data-i18n="tab_goal">Goal SIP</a><a href="#calculators" data-i18n="tab_retire">Retirement</a><a href="#calculators" data-i18n="tab_stepup">Step-up SIP</a><a href="#calculators" data-i18n="tab_swp">SWP</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot_resources_h4">Resources</h4>
+        <a href="#risk-profile" data-i18n="nav_risk_t">Risk profile</a><a href="#awareness" data-i18n="nav_aware_t">Awareness sessions</a><a href="#guidance" data-i18n="nav_rm">Relationship manager</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot_company_h4">Company</h4>
+        <a href="#trust" data-i18n="nav_trust">Trust &amp; compliance</a><a href="#faq" data-i18n="nav_faq">FAQ</a><a href="tel:+917800450600">+91 78004 50600</a><a href="mailto:niveshtrack@gmail.com">niveshtrack@gmail.com</a>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <div class="row1"><span>NIVESH TRACK — A BRAND OF CADENCE FINSERVE PRIVATE LIMITED</span><span data-i18n="foot_row1_2">AMFI-REGISTERED MFD · ARN-165724</span><span>© 2026</span></div>
+      <p data-i18n="foot_legal_p">Nivesh Track, a brand of Cadence Finserve Private Limited, is an AMFI-registered Mutual Fund Distributor (ARN-165724) and is not a SEBI-registered Investment Adviser. We are purely a distributor of mutual funds and earn our commission as a product distributor from Asset Management Companies; we do not charge investors any additional fee for this. Mutual fund investments are subject to market risks. The NAVs of the schemes may go up or down depending on the factors and forces affecting the securities market, including fluctuations in interest rates. Please read all scheme-related documents carefully before investing, including the Scheme Information Document and Key Information Memorandum — past performance is not indicative of future performance. PMS, AIF, SIF, insurance, tax planning, estate planning and GIFT City investing are each governed by their own regulator, separate from our AMFI registration, and are offered only once the relevant registration or partner arrangement is confirmed and on file — see Trust &amp; compliance for current status. While all efforts have been made to keep this website accurate, please refer to official scheme documents and regulatory notifications as the authentic source before acting on anything shown here. Nothing on this website constitutes investment advice, a recommendation, or an offer to buy or sell any security or scheme. For any clarification, write to niveshtrack@gmail.com.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var toggle = document.getElementById('navToggle');
+  var links = document.getElementById('navLinks');
+  toggle.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.querySelectorAll('.has-drop').forEach(function(d){
+    d.querySelector('button').addEventListener('click', function(){
+      if (window.matchMedia('(max-width:1040px)').matches){
+        var isOpen = d.classList.toggle('open');
+        this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      }
+    });
+  });
+  links.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ links.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); });
+  });
+
+  function fmtRupee(n){ return '₹ ' + Math.round(n).toLocaleString('en-IN'); }
+
+  /* Goal SIP calculator */
+  (function(){
+    var amt = document.getElementById('g_amount'), yrs = document.getElementById('g_years'), ret = document.getElementById('g_return'), out = document.getElementById('g_out');
+    if(!amt) return;
+    function compute(){
+      var fv = parseFloat(amt.value) || 0, years = parseFloat(yrs.value) || 0, pct = parseFloat(ret.value) || 0;
+      if(fv <= 0 || years <= 0){ out.textContent = '—'; return; }
+      var r = (pct/100)/12, n = years*12;
+      var sip = r === 0 ? fv/n : fv / ((((Math.pow(1+r,n)-1)/r))*(1+r));
+      out.textContent = fmtRupee(sip);
+    }
+    [amt,yrs,ret].forEach(function(el){ el.addEventListener('input', compute); });
+    compute();
+  })();
+
+  /* Retirement calculator */
+  (function(){
+    var age=document.getElementById('r_age'), retireAge=document.getElementById('r_retireAge'), expense=document.getElementById('r_expense'),
+        postYears=document.getElementById('r_postYears'), inflation=document.getElementById('r_inflation'),
+        preReturn=document.getElementById('r_preReturn'), postReturn=document.getElementById('r_postReturn'),
+        corpusOut=document.getElementById('r_corpus'), sipOut=document.getElementById('r_sip');
+    if(!age) return;
+    function compute(){
+      var a=parseFloat(age.value)||0, ra=parseFloat(retireAge.value)||0, exp=parseFloat(expense.value)||0,
+          py=parseFloat(postYears.value)||0, infl=(parseFloat(inflation.value)||0)/100,
+          preR=(parseFloat(preReturn.value)||0)/100, postR=(parseFloat(postReturn.value)||0)/100;
+      var yearsToRetire = ra - a;
+      if(yearsToRetire <= 0 || py <= 0 || exp <= 0){ corpusOut.textContent='—'; sipOut.textContent='—'; return; }
+      var futureAnnualExpense = exp*12*Math.pow(1+infl, yearsToRetire);
+      var corpus;
+      if(Math.abs(postR-infl) < 0.0001){
+        corpus = futureAnnualExpense * py / (1+postR);
+      } else {
+        corpus = futureAnnualExpense * (1 - Math.pow((1+infl)/(1+postR), py)) / (postR-infl);
+      }
+      corpusOut.textContent = fmtRupee(corpus);
+      var rMonthly = preR/12, nMonths = yearsToRetire*12;
+      var sip = rMonthly === 0 ? corpus/nMonths : corpus / ((((Math.pow(1+rMonthly,nMonths)-1))/rMonthly)*(1+rMonthly));
+      sipOut.textContent = fmtRupee(sip);
+    }
+    [age,retireAge,expense,postYears,inflation,preReturn,postReturn].forEach(function(el){ el.addEventListener('input', compute); });
+    compute();
+  })();
+
+  /* Step-up SIP calculator */
+  (function(){
+    var sip=document.getElementById('s_sip'), stepup=document.getElementById('s_stepup'), years=document.getElementById('s_years'), ret=document.getElementById('s_return'),
+        investedOut=document.getElementById('s_invested'), valueOut=document.getElementById('s_value');
+    if(!sip) return;
+    function compute(){
+      var baseSip=parseFloat(sip.value)||0, step=(parseFloat(stepup.value)||0)/100, yrs=parseFloat(years.value)||0, pct=(parseFloat(ret.value)||0)/100;
+      if(baseSip <= 0 || yrs <= 0){ investedOut.textContent='—'; valueOut.textContent='—'; return; }
+      var rMonthly = pct/12;
+      var totalFV = 0, totalInvested = 0;
+      for(var y=0; y<yrs; y++){
+        var sipThisYear = baseSip * Math.pow(1+step, y);
+        totalInvested += sipThisYear*12;
+        var blockFV = rMonthly === 0 ? sipThisYear*12 : sipThisYear * ((Math.pow(1+rMonthly,12)-1)/rMonthly) * (1+rMonthly);
+        var monthsRemaining = (yrs - y - 1)*12;
+        totalFV += blockFV * Math.pow(1+rMonthly, monthsRemaining);
+      }
+      investedOut.textContent = fmtRupee(totalInvested);
+      valueOut.textContent = fmtRupee(totalFV);
+    }
+    [sip,stepup,years,ret].forEach(function(el){ el.addEventListener('input', compute); });
+    compute();
+  })();
+
+  /* SWP calculator */
+  (function(){
+    var corpus=document.getElementById('w_corpus'), withdraw=document.getElementById('w_withdraw'), ret=document.getElementById('w_return'), out=document.getElementById('w_out');
+    if(!corpus) return;
+    function compute(){
+      var bal=parseFloat(corpus.value)||0, wd=parseFloat(withdraw.value)||0, pct=(parseFloat(ret.value)||0)/100;
+      if(bal <= 0 || wd <= 0){ out.textContent='—'; return; }
+      var rMonthly = pct/12, months=0, cap=600;
+      while(bal > 0 && months < cap){
+        bal = bal*(1+rMonthly) - wd;
+        months++;
+      }
+      if(months >= cap){ out.textContent = '50+ years'; return; }
+      var years = Math.floor(months/12), rem = months%12;
+      out.textContent = years + 'y ' + rem + 'm';
+    }
+    [corpus,withdraw,ret].forEach(function(el){ el.addEventListener('input', compute); });
+    compute();
+  })();
+
+  /* calculator tabs */
+  (function(){
+    var tabs = document.querySelectorAll('.calc-tab');
+    tabs.forEach(function(tab){
+      tab.addEventListener('click', function(){
+        tabs.forEach(function(t){ t.classList.remove('active'); });
+        document.querySelectorAll('.calc-panel').forEach(function(p){ p.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+      });
+    });
+  })();
+
+  /* risk profile quiz */
+  (function(){
+    var form = document.getElementById('riskForm');
+    if(!form) return;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var total = 0, answered = 0;
+      for(var i=1;i<=6;i++){
+        var picked = form.querySelector('input[name="q'+i+'"]:checked');
+        if(picked){ total += parseInt(picked.value,10); answered++; }
+      }
+      if(answered < 6){ alert(window.CURRENT_LANG === 'hi' ? 'कृपया सभी छह प्रश्नों के उत्तर दें।' : 'Please answer all six questions.'); return; }
+      var category;
+      if(total <= 10) category = 'Conservative';
+      else if(total <= 15) category = 'Moderate';
+      else if(total <= 20) category = 'Growth';
+      else category = 'Aggressive';
+      window.lastRiskCategory = category;
+      if(window.renderRiskResult) window.renderRiskResult();
+      document.getElementById('riskResult').classList.add('show');
+      document.getElementById('riskResult').scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  })();
+
+  /* lead form (other services) — no backend yet, falls back to a pre-filled email */
+  (function(){
+    var form = document.getElementById('leadForm');
+    if(!form) return;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var f = new FormData(form);
+      var lines = [
+        'Name: ' + (f.get('name') || ''),
+        'Email: ' + (f.get('email') || ''),
+        'Mobile: ' + (f.get('mobile') || ''),
+        'Product: ' + (f.get('product') || ''),
+        'Message: ' + (f.get('message') || '')
+      ];
+      var body = encodeURIComponent(lines.join('\n'));
+      var subject = encodeURIComponent('Service enquiry — ' + (f.get('product') || 'General'));
+      window.location.href = 'mailto:niveshtrack@gmail.com?subject=' + subject + '&body=' + body;
+    });
+  })();
+
+  /* callback request (relationship manager) — no backend yet, falls back to a pre-filled email */
+  (function(){
+    var form = document.getElementById('callbackForm');
+    if(!form) return;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var f = new FormData(form);
+      var lines = [
+        'Name: ' + (f.get('name') || ''),
+        'Mobile: ' + (f.get('mobile') || ''),
+        'Preferred time to call: ' + (f.get('preferred_time') || '')
+      ];
+      var body = encodeURIComponent(lines.join('\n'));
+      var subject = encodeURIComponent('Callback request — ' + (f.get('name') || ''));
+      window.location.href = 'mailto:niveshtrack@gmail.com?subject=' + subject + '&body=' + body;
+    });
+  })();
+
+  /* awareness session request — no backend yet, falls back to a pre-filled email */
+  (function(){
+    var form = document.getElementById('awarenessForm');
+    if(!form) return;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var f = new FormData(form);
+      var lines = [
+        'Organization: ' + (f.get('organization') || ''),
+        'Contact person: ' + (f.get('contact_name') || ''),
+        'Email: ' + (f.get('email') || ''),
+        'Phone: ' + (f.get('phone') || ''),
+        'City: ' + (f.get('city') || ''),
+        'Approx. group size: ' + (f.get('group_size') || ''),
+        'What to cover: ' + (f.get('message') || '')
+      ];
+      var body = encodeURIComponent(lines.join('\n'));
+      var subject = encodeURIComponent('Investor awareness session request — ' + (f.get('organization') || ''));
+      window.location.href = 'mailto:niveshtrack@gmail.com?subject=' + subject + '&body=' + body;
+    });
+  })();
+
+  /* ===== Hindi / English language toggle ===== */
+  var HI = {
+    strip1:'निवेश ट्रैक, कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड — AMFI-पंजीकृत म्यूचुअल फंड डिस्ट्रीब्यूटर',
+    strip2:'म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं। कृपया स्कीम से जुड़े दस्तावेज़ ध्यान से पढ़ें।',
+    brand_tag:'कैडेंस फिनसर्व का एक ब्रांड',
+    nav_other:'अन्य सेवाएँ', nav_pms_t:'PMS', nav_pms_d:'मैनेज्ड पोर्टफोलियो', nav_aif_t:'AIF', nav_aif_d:'कैटेगरी I/II/III फंड',
+    nav_sif_t:'SIF', nav_sif_d:'SEBI की मिड-टिकट कैटेगरी', nav_ins_t:'बीमा', nav_ins_d:'जीवन, स्वास्थ्य व सामान्य बीमा',
+    nav_tax_t:'टैक्स प्लानिंग', nav_tax_d:'सामान्य जानकारी', nav_estate_t:'एस्टेट प्लानिंग', nav_estate_d:'एक कानूनी पार्टनर के साथ',
+    nav_gift_t:'गिफ्ट सिटी इन्वेस्टिंग', nav_gift_d:'एक नामित पार्टनर के ज़रिए',
+    nav_app:'ऐप', nav_calc:'कैलकुलेटर', nav_resources:'संसाधन', nav_risk_t:'रिस्क प्रोफाइल', nav_risk_d:'दो मिनट का सेल्फ-असेसमेंट',
+    nav_aware_t:'जागरूकता सत्र', nav_aware_d:'आपके संगठन के लिए', nav_rm:'रिलेशनशिप मैनेजर', nav_trust:'ट्रस्ट व कम्प्लायंस', nav_faq:'सामान्य प्रश्न', nav_getapp:'ऐप डाउनलोड करें',
+    hero_eyebrow:'म्यूचुअल फंड, आसान तरीके से',
+    hero_h1:'घर से अपना SIP शुरू करें — हर रुपया एक ही पासबुक में ट्रैक करें।',
+    hero_lede:'निवेश ट्रैक, कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड, 2019 से AMFI-पंजीकृत म्यूचुअल फंड डिस्ट्रीब्यूटर है (ARN-165724)। म्यूचुअल फंड के अलावा, हम आपको हमारे रिलेशनशिप मैनेजर और पार्टनर्स के ज़रिए PMS, AIF, SIF, बीमा, टैक्स प्लानिंग, एस्टेट प्लानिंग और गिफ्ट सिटी इन्वेस्टिंग से भी जोड़ते हैं।',
+    hero_cta1:'अपना SIP शुरू करें', hero_cta2:'अन्य सेवाएँ देखें',
+    hero_note:'निवेश में नए हैं? ऐप से KYC पूरा करें और पहला SIP शुरू करें — किसी ब्रांच जाने की ज़रूरत नहीं।',
+    pb_b1:'निवेश ट्रैक<br>म्यूचुअल फंड पासबुक', pb_b2:'खाता प्रकार<br>SIP व एकमुश्त',
+    pb_r1_t:'SIP — फ्लेक्सीकैप फंड', pb_r1_d:'मासिक · स्वयं चुना गया',
+    pb_r2_t:'SIP — ELSS फंड', pb_r2_d:'मासिक · टैक्स-सेविंग',
+    pb_r3_t:'एकमुश्त — डेट फंड', pb_r3_d:'एक बार',
+    pb_r4_t:'SIP — इंडेक्स फंड', pb_r4_d:'मासिक · हमारी शॉर्टलिस्ट से',
+    pb_tracked:'↑ ट्रैक हो रहा है', pb_illustrative:'उदाहरण मात्र', pb_updated:'स्वचालित रूप से अपडेट',
+    fact1_t:'AMFI-पंजीकृत MFD', fact1_d:'ARN-165724 · स्थापना 2019',
+    fact_aum_t:'1,900+ परिवार · ~₹500 करोड़ AUM', fact_aum_d:'हमारे निवेशकों में ट्रैक किया गया',
+    fact2_t:'एक नामित रिलेशनशिप मैनेजर', fact2_d:'हर सेवा के लिए एक ही संपर्क',
+    fact3_t:'मुफ़्त जागरूकता सत्र', fact3_d:'संगठनों व टीमों के लिए',
+    fact4_d:'कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड',
+    app_eyebrow:'यहाँ से शुरू करें — निवेश ट्रैक ऐप',
+    app_h2:'आपकी म्यूचुअल फंड यात्रा, बिना किसी कागज़ी काम के।',
+    app_intro:'निवेश ट्रैक को आपके फोन से ही म्यूचुअल फंड निवेश को आसान बनाने के लिए बनाया गया है। अपना KYC पूरा करें और कुछ ही मिनटों में अपना पहला SIP शुरू करें — यह सब निवेश ट्रैक प्लेटफ़ॉर्म पर ही होता है, न किसी ब्रांच जाने की ज़रूरत, न किसी कागज़ी फॉर्म की।',
+    app_l1_t:'सेल्फ-सर्व KYC व ऑनबोर्डिंग', app_l1_d:'निवेश ट्रैक प्लेटफ़ॉर्म पर डिजिटल रूप से KYC पूरा करें — कुछ ही मिनटों में, कहीं से भी।',
+    app_l2_t:'अपनी स्कीम स्वयं चुनें, या हमारी शॉर्टलिस्ट से शुरू करें', app_l2_d:'स्वयं खोजें और चुनें, या हमारे इन्वेस्टमेंट रिसर्च डेस्क की शॉर्टलिस्ट से शुरुआत करें — फ़ैसला हमेशा आपका ही रहता है।',
+    app_l3_t:'समेकित पोर्टफोलियो व्यू', app_l3_d:'सभी फंड हाउस की हर स्कीम, फोलियो और SIP एक ही जगह।',
+    app_l4_t:'सिस्टमैटिक रिपोर्ट्स', app_l4_d:'अपने समय अनुसार स्टेटमेंट और परफॉर्मेंस रिपोर्ट निकालें।',
+    app_l5_t:'गोल ट्रैकिंग', app_l5_d:'निवेश को किसी गोल से जोड़ें और उसकी प्रगति को ख़ास तौर पर देखें।',
+    app_l6_t:'SIP शुरू करें और मैनेज करें', app_l6_d:'नए SIP और एकमुश्त निवेश, सीधे ऐप से।',
+    app_l7_t:'एक नामित रिलेशनशिप मैनेजर', app_l7_d:'ऑनबोर्डिंग, SIP में बदलाव और गोल-आधारित मार्गदर्शन के लिए निवेश ट्रैक में एक व्यक्ति।',
+    steps_eyebrow:'शुरुआत कैसे करें', steps_h2:'आपके पहले SIP तक चार क़दम।',
+    step1_idx:'प्रविष्टि 01', step2_idx:'प्रविष्टि 02', step3_idx:'प्रविष्टि 03', step4_idx:'प्रविष्टि 04',
+    step1_t:'डाउनलोड व रजिस्टर करें', step1_d:'ऐप डाउनलोड करें और अपने PAN व मोबाइल नंबर से साइन अप करें।',
+    step2_t:'सेल्फ-सर्व e-KYC पूरा करें', step2_d:'SEBI के KYC नियमों के अनुसार, हमारे ऑनबोर्डिंग प्लेटफ़ॉर्म पर डिजिटल रूप से पहचान सत्यापित करें।',
+    step3_t:'खोजें और निवेश करें', step3_d:'स्वयं एक स्कीम चुनें, या हमारी शॉर्टलिस्ट से शुरू करें, फिर SIP शुरू करें।',
+    step4_t:'एक ही जगह ट्रैक करें', step4_d:'जैसे-जैसे ट्रांज़ैक्शन सेटल होते हैं, आपकी पासबुक अपडेट होती है।',
+    os_eyebrow:'म्यूचुअल फंड के अलावा', os_h2:'आपके वित्तीय जीवन का बाक़ी हिस्सा — एक मैसेज की दूरी पर।',
+    os_intro:'हम मुख्य रूप से एक म्यूचुअल फंड डिस्ट्रीब्यूटर हैं। इनके लिए, हम आपको सही पंजीकृत पार्टनर या विशेषज्ञ से जोड़ते हैं — नीचे अपनी जानकारी छोड़ें और एक रिलेशनशिप मैनेजर आपसे संपर्क करेगा।',
+    svc1_t:'PMS', svc1_d:'म्यूचुअल फंड की टिकट साइज़ से आगे के निवेशकों के लिए पेशेवर रूप से प्रबंधित, केंद्रित पोर्टफोलियो।',
+    svc2_t:'AIF', svc2_d:'कैटेगरी I, II और III के ऑल्टरनेटिव इन्वेस्टमेंट फंड, एम्पैनल्ड फंड मैनेजरों के साथ।',
+    svc3_t:'SIF', svc3_d:'म्यूचुअल फंड और PMS के बीच SEBI की नई कैटेगरी — न्यूनतम ₹10 लाख।',
+    svc4_t:'बीमा', svc4_d:'हमारे पंजीकृत इंश्योरर पैनल के साथ जीवन, स्वास्थ्य और सामान्य बीमा कवर।',
+    svc5_t:'टैक्स प्लानिंग', svc5_d:'आपके निवेश के साथ सामान्य टैक्स-प्लानिंग जानकारी — आपके CA का विकल्प नहीं।',
+    svc6_t:'एस्टेट प्लानिंग', svc6_d:'एक लाइसेंस्ड लीगल पार्टनर के साथ, आपकी संपत्ति के हस्तांतरण की संरचना।',
+    svc7_t:'गिफ्ट सिटी इन्वेस्टिंग', svc7_d:'गिफ्ट सिटी के IFSC के ज़रिए, एक नामित पार्टनर के माध्यम से ग्लोबल मार्केट एक्सेस।',
+    os_devnote_s:'ड्राफ्ट-चरण नोट, सार्वजनिक साइट के लिए नहीं:',
+    os_devnote_p:'यह फॉर्म अभी केवल विवरण भरा हुआ एक ईमेल खोलता है — इसमें अभी कोई बैकएंड या CRM जुड़ा नहीं है। हर प्रोडक्ट के पंजीकरण विवरण (APRN, इंश्योरर पैनल, IFSCA पार्टनर आदि) जानबूझकर इन कार्ड्स से हटाकर नीचे ट्रस्ट व कम्प्लायंस में एक साथ रखे गए हैं।',
+    lf_h3:'इनमें से किसी में दिलचस्पी है?',
+    lf_p:'अपनी ईमेल और मोबाइल नंबर उस प्रोडक्ट के साथ छोड़ें जिसमें आपकी दिलचस्पी है — एक रिलेशनशिप मैनेजर आगे की प्रक्रिया के लिए आपसे संपर्क करेगा।',
+    f_name:'नाम', f_email:'ईमेल', f_mobile:'मोबाइल',
+    lf_product_label:'कौन सा प्रोडक्ट?', lf_opt_select:'एक चुनें', lf_opt_notsure:'अभी तय नहीं',
+    lf_message_label:'कुछ और जोड़ना है? (वैकल्पिक)', f_request_callback:'कॉलबैक का अनुरोध करें',
+    lf_fine:'हम इस जानकारी का उपयोग केवल आपके चुने गए प्रोडक्ट के बारे में संपर्क करने के लिए करेंगे।',
+    gd_eyebrow:'सेवा मॉडल', gd_h2:'सिर्फ़ एक ऐप नहीं, एक रिलेशनशिप मैनेजर भी।',
+    gd_intro:'हर क्लाइंट को निवेश ट्रैक में एक रिलेशनशिप मैनेजर दिया जाता है — हर सेवा के लिए एक ही संपर्क बिंदु, न कि बदलती सपोर्ट क्यू।',
+    gd_h3:'गोल-आधारित मार्गदर्शन, नियमों के दायरे में',
+    gd_p1:'ख़ास तौर पर म्यूचुअल फंड के लिए, निवेश ट्रैक को SEBI के फ्रेमवर्क के अनुसार <em>इन्सिडेंटल एडवाइस</em> देने की अनुमति है — आपके गोल, समय-सीमा और रिस्क कम्फर्ट के आधार पर, हमारे द्वारा डिस्ट्रीब्यूट की जाने वाली स्कीमों तक सीमित, बुनियादी, गोल-आधारित मार्गदर्शन। आप हमेशा स्वयं एक स्कीम चुन सकते हैं; हमारे इन्वेस्टमेंट रिसर्च डेस्क की शॉर्टलिस्ट एक शुरुआती बिंदु है, कोई आवश्यकता नहीं।',
+    gd_p2:'PMS, AIF, SIF, बीमा, टैक्स और एस्टेट प्लानिंग के लिए, आपके रिलेशनशिप मैनेजर की भूमिका आपको उस प्रोडक्ट के लिए विशेष रूप से पंजीकृत विशेषज्ञ या पार्टनर से जोड़ना है — किसी अलग रेगुलेटर के अंतर्गत आने वाले प्रोडक्ट्स में म्यूचुअल-फंड-जैसा मार्गदर्शन बढ़ाना नहीं।',
+    gcta1_t:'आंकड़े देखें', gcta1_d:'गोल, रिटायरमेंट, स्टेप-अप व SWP कैलकुलेटर',
+    gcta2_t:'अपनी रिस्क प्रोफाइल जानें', gcta2_d:'दो मिनट का सेल्फ-असेसमेंट',
+    cb_title:'कॉलबैक का अनुरोध करें', cb_p:'अपना नंबर छोड़ें और एक रिलेशनशिप मैनेजर आपको कॉल करेगा।',
+    cb_mobile_label:'मोबाइल नंबर', cb_time_label:'कॉल के लिए पसंदीदा समय',
+    cb_fine:'ड्राफ्ट नोट: अभी कोई बैकएंड नहीं जुड़ा है — यह अभी एक पहले से भरा हुआ ईमेल खोलता है।',
+    calc_eyebrow:'आंकड़े समझें', calc_h2:'चार कैलकुलेटर, जिनका आप वास्तव में उपयोग करेंगे।',
+    calc_intro:'यहाँ हर परिणाम उदाहरण मात्र है — आपके द्वारा दर्ज किए गए आंकड़ों और रिटर्न अनुमान पर आधारित, निवेश ट्रैक की ओर से कोई वायदा नहीं। म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं।',
+    tab_goal:'गोल SIP', tab_retire:'रिटायरमेंट', tab_stepup:'स्टेप-अप SIP', tab_swp:'SWP',
+    goal_h3:'किसी गोल तक पहुँचने के लिए क्या चाहिए?', goal_p:'अपने रिलेशनशिप मैनेजर के साथ बातचीत के लिए एक शुरुआती बिंदु।',
+    goal_amount:'गोल राशि', goal_years:'गोल तक समय', u_years:'साल', calc_return:'अनुमानित वार्षिक रिटर्न',
+    goal_result_label:'अनुमानित मासिक SIP आवश्यक',
+    calc_fine_a:'उदाहरण मात्र, आपके द्वारा दर्ज किए गए रिटर्न पर आधारित — यह निवेश ट्रैक द्वारा दिया गया, गारंटीकृत या अनुमानित रिटर्न नहीं है।',
+    retire_h3:'रिटायरमेंट की लागत कितनी होगी, और किस SIP से वहाँ पहुँचा जा सकता है?',
+    retire_p:'यह मानकर कि रिटायरमेंट के दौरान आपके खर्च महंगाई के साथ बढ़ते रहेंगे।',
+    retire_age:'वर्तमान उम्र', u_yrs:'वर्ष', retire_retireage:'रिटायरमेंट की उम्र', retire_expense:'आज का मासिक खर्च',
+    retire_postyears:'रिटायरमेंट में वर्ष', retire_inflation:'महंगाई दर', retire_prepost:'रिटायरमेंट से पहले / बाद का रिटर्न',
+    retire_corpus_label:'रिटायरमेंट पर आवश्यक कोष', retire_sip_label:'आज आवश्यक मासिक SIP',
+    retire_fine:'उदाहरण मात्र। वास्तविक महंगाई और रिटर्न अलग हो सकते हैं, और यह आपकी मौजूदा बचत या EPF/NPS बैलेंस को ध्यान में नहीं रखता।',
+    stepup_h3:'अगर आपका SIP हर साल बढ़ता रहे तो क्या होगा?', stepup_p:'आपके मासिक SIP में एक तय वार्षिक बढ़ोतरी का अनुमान।',
+    stepup_start:'शुरुआती मासिक SIP', stepup_annual:'वार्षिक स्टेप-अप', stepup_duration:'अवधि',
+    stepup_invested_label:'कुल निवेश', stepup_value_label:'अनुमानित मूल्य',
+    swp_h3:'विदड्रॉल प्लान कितने समय तक चलेगा?', swp_p:'एक एकमुश्त राशि के लिए जिससे आप हर महीने एक तय रकम निकाल रहे हैं।',
+    swp_corpus:'शुरुआती कोष', swp_withdraw:'मासिक विदड्रॉल', swp_result_label:'आपका कोष लगभग इतने समय तक चलेगा',
+    swp_fine:'उदाहरण मात्र। बाज़ार में उतार-चढ़ाव के कारण वास्तविक रिटर्न कभी भी इस अनुमान जैसी एक समान मासिक दर नहीं होता।',
+    risk_eyebrow:'पहले खुद को जानें', risk_h2:'आप किस तरह के निवेशक हैं?',
+    risk_intro:'दो मिनट का सेल्फ-असेसमेंट — यह SEBI के KYC नियमों के अनुसार, ऑनबोर्डिंग के दौरान आपके रिलेशनशिप मैनेजर द्वारा की जाने वाली पूरी रिस्क-प्रोफाइलिंग का विकल्प नहीं है।',
+    q1_t:'1. आपकी उम्र का दायरा', q1_o1:'30 से कम', q1_o2:'30–45', q1_o3:'46–55', q1_o4:'55 से ऊपर',
+    q2_t:'2. आपको यह पैसा कब तक चाहिए होगा?', q2_o1:'1 साल से कम', q2_o2:'1–3 साल', q2_o3:'3–7 साल', q2_o4:'7+ साल',
+    q3_t:'3. आपका पोर्टफोलियो एक महीने में 20% गिर जाता है। आप:', q3_o1:'सब बेच देते हैं', q3_o2:'सुरक्षा के लिए कुछ बेच देते हैं', q3_o3:'कुछ नहीं करते, इंतज़ार करते हैं', q3_o4:'गिरावट में और निवेश करते हैं',
+    q4_t:'4. इस पैसे के साथ आपका मुख्य लक्ष्य', q4_o1:'जो है उसे सुरक्षित रखना', q4_o2:'नियमित आय', q4_o3:'संतुलित विकास', q4_o4:'अधिकतम लंबी अवधि का विकास',
+    q5_t:'5. अब तक आपका निवेश अनुभव', q5_o1:'कोई नहीं', q5_o2:'कुछ — म्यूचुअल फंड या FD', q5_o3:'मध्यम — डायरेक्ट इक्विटी भी', q5_o4:'कई एसेट क्लास में अनुभवी',
+    q6_t:'6. आपकी आय की स्थिरता', q6_o1:'अनियमित / अनिश्चित', q6_o2:'स्थिर, एक ही स्रोत', q6_o3:'स्थिर, कई स्रोत', q6_o4:'बहुत स्थिर, अतिरिक्त बचत के साथ',
+    risk_btn:'मेरी रिस्क प्रोफाइल देखें', risk_cta:'इस बारे में कॉलबैक का अनुरोध करें',
+    risk_fine:'यह एक सामान्य सेल्फ-असेसमेंट है, व्यक्तिगत सलाह नहीं। आपका रिलेशनशिप मैनेजर ऑनबोर्डिंग के दौरान पूरी रिस्क-प्रोफाइलिंग करेगा।',
+    aw_eyebrow:'संगठनों व टीमों के लिए', aw_h2:'अपने लोगों के लिए एक निवेशक जागरूकता सत्र आयोजित करें।',
+    aw_devnote_s:'ड्राफ्ट-चरण नोट, सार्वजनिक साइट के लिए नहीं:',
+    aw_devnote_p:'यह फॉर्म अभी केवल विवरण भरा हुआ एक ईमेल खोलता है — इसमें कोई बैकएंड नहीं है। लॉन्च से पहले इसे अपनी पसंद के CRM या इनबॉक्स से जोड़ें।',
+    aw_h3:'मुफ़्त, किसी भी बिक्री से स्वतंत्र',
+    aw_p:'हम संगठनों, कर्मचारी समूहों और सामुदायिक संस्थाओं के लिए मुफ़्त निवेशक जागरूकता सत्र आयोजित करते हैं, जो हमारी टीम के एक योग्य वित्तीय विशेषज्ञ द्वारा संचालित होते हैं। ये सत्र सामान्य शिक्षा हैं — व्यक्तिगत पोर्टफोलियो रिव्यू नहीं, और किसी भी निवेश, बीमा या अन्य प्रोडक्ट की बिक्री से स्वतंत्र रूप से आयोजित होते हैं।',
+    aw_org:'संगठन का नाम', aw_contact:'संपर्क व्यक्ति', aw_phone:'फ़ोन', aw_city:'शहर', aw_groupsize:'लगभग समूह का आकार',
+    aw_message_label:'आप किस विषय पर चर्चा चाहते हैं?', aw_submit:'सत्र का अनुरोध करें',
+    aw_fine:'हम इस जानकारी का उपयोग केवल आपके सत्र को शेड्यूल करने के लिए संपर्क करने हेतु करेंगे।',
+    seal_detail:'स्थापना 2019<br>AMFI-पंजीकृत MFD<br>ARN-165724',
+    trust_eyebrow:'ट्रस्ट व कम्प्लायंस', trust_h3:'निवेश ट्रैक डिस्ट्रीब्यूट करता है। सलाह नहीं देता।',
+    trust_p1:'निवेश ट्रैक, कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड, 2019 से AMFI-पंजीकृत म्यूचुअल फंड डिस्ट्रीब्यूटर है — ARN-165724। आज हम 1,900 से अधिक निवेशक परिवारों की सेवा करते हैं, जिनके क्लाइंट पोर्टफोलियो में लगभग ₹500 करोड़ ट्रैक किया जाता है। हम पूरी तरह से म्यूचुअल फंड के डिस्ट्रीब्यूटर हैं और एसेट मैनेजमेंट कंपनियों से प्रोडक्ट डिस्ट्रीब्यूटर के रूप में कमीशन कमाते हैं; हम SEBI-पंजीकृत इन्वेस्टमेंट एडवाइज़र नहीं हैं। PMS, AIF, SIF, बीमा, टैक्स प्लानिंग, एस्टेट प्लानिंग और गिफ्ट सिटी इन्वेस्टिंग के लिए, हम आपको विशेष रूप से पंजीकृत पार्टनर्स से जोड़ते हैं और इस संपर्क के लिए कोई अलग फ़ीस नहीं लेते।',
+    trust_fine:'म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं। स्कीमों का NAV, सिक्योरिटीज़ मार्केट को प्रभावित करने वाले कारकों और ताक़तों के आधार पर, जिनमें ब्याज दरों में उतार-चढ़ाव भी शामिल है, ऊपर या नीचे जा सकता है। निवेश से पहले सभी स्कीम से संबंधित दस्तावेज़ ध्यान से पढ़ें, जिनमें स्कीम इंफॉर्मेशन डॉक्यूमेंट और की इंफॉर्मेशन मेमोरेंडम शामिल हैं। पिछला प्रदर्शन भविष्य के रिटर्न का संकेत नहीं है।',
+    status_th1:'सेवा / पार्टनर', status_th2:'रेगुलेटर', status_th3:'स्थिति',
+    status_mf:'ARN-165724 — पुष्टि की गई', status_pms:'APRN व प्रोवाइडर की आवश्यकता',
+    status_aif_reg:'प्रत्येक फंड मैनेजर के अनुसार', status_aif:'एम्पैनलमेंट सूची की आवश्यकता',
+    status_sif_reg:'SEBI (SIF फ्रेमवर्क)', status_sif:'सर्टिफिकेशन की पुष्टि होनी बाकी',
+    status_ins:'पंजीकरण प्रकार, नंबर व पैनल की आवश्यकता',
+    status_tax_reg:'— (CA द्वारा)', status_tax:'डिलीवरी मॉडल की पुष्टि होनी बाकी',
+    status_estate_reg:'— (लीगल पार्टनर)', status_estate:'पार्टनर का नाम आवश्यक', status_gift:'पार्टनर एंटिटी आवश्यक',
+    status_note:'AMC से प्राप्त कमीशन का श्रेणी-वार विवरण अनुरोध पर उपलब्ध है — वर्तमान शेड्यूल के लिए niveshtrack@gmail.com पर लिखें।',
+    faq_eyebrow:'प्रश्न', faq_h2:'संपर्क करने से पहले।',
+    faq1_q:'क्या निवेश ट्रैक एक फाइनेंशियल एडवाइज़र है?',
+    faq1_a:'नहीं। निवेश ट्रैक, कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड, AMFI के साथ म्यूचुअल फंड डिस्ट्रीब्यूटर (ARN-165724) के रूप में पंजीकृत है, SEBI इन्वेस्टमेंट एडवाइज़र के रूप में नहीं। म्यूचुअल फंड के लिए, आपका रिलेशनशिप मैनेजर डिस्ट्रीब्यूशन के अंतर्गत बुनियादी, गोल-आधारित मार्गदर्शन दे सकता है। PMS, AIF, SIF, बीमा, टैक्स और एस्टेट प्लानिंग के लिए, हम आपको उस प्रोडक्ट के लिए विशेष रूप से पंजीकृत विशेषज्ञ से जोड़ते हैं।',
+    faq2_q:'क्या ऐप इस्तेमाल करने के लिए मुझे पहले से क्लाइंट होना ज़रूरी है?',
+    faq2_a:'नहीं। यह ऐप सभी के लिए म्यूचुअल फंड निवेश को आसान बनाने हेतु बनाया गया है — आप सीधे ऐप से KYC पूरा कर सकते हैं और अपना पहला SIP शुरू कर सकते हैं।',
+    faq3_q:'क्या मैं अपनी म्यूचुअल फंड स्कीम स्वयं चुन सकता हूँ?',
+    faq3_a:'हाँ। आप स्वयं कोई स्कीम शोध कर चुन सकते हैं, या अगर एक शुरुआती बिंदु चाहिए तो हमारे इन्वेस्टमेंट रिसर्च डेस्क की शॉर्टलिस्ट से शुरू कर सकते हैं — किसी भी तरह, अंतिम फ़ैसला आपका ही है।',
+    faq4_q:'डिस्ट्रीब्यूटर और RIA में क्या अंतर है?',
+    faq4_a:'एक डिस्ट्रीब्यूटर (जो हम म्यूचुअल फंड के लिए हैं) AMC से कमीशन कमाता है और अपने द्वारा डिस्ट्रीब्यूट की जाने वाली स्कीमों तक सीमित बुनियादी मार्गदर्शन दे सकता है। एक रजिस्टर्ड इन्वेस्टमेंट एडवाइज़र सीधे फ़ीस लेता है और व्यापक, व्यक्तिगत फाइनेंशियल प्लानिंग दे सकता है। हम पहले वाले हैं।',
+    faq5_q:'SIF क्या है, और इसमें कौन निवेश कर सकता है?',
+    faq5_a:'स्पेशलाइज़्ड इन्वेस्टमेंट फंड SEBI की नई कैटेगरी है जो म्यूचुअल फंड और PMS के बीच आती है, जिसमें न्यूनतम ₹10 लाख का निवेश ज़रूरी है। यह उन निवेशकों के लिए है जो एक सामान्य म्यूचुअल फंड से अधिक लचीलापन चाहते हैं लेकिन अभी PMS की टिकट साइज़ तक नहीं पहुँचे हैं।',
+    faq6_q:'गिफ्ट सिटी इन्वेस्टिंग क्या है?',
+    faq6_a:'गिफ्ट सिटी के इंटरनेशनल फाइनेंशियल सर्विसेज़ सेंटर के ज़रिए, RBI की लिबरलाइज़्ड रेमिटेंस स्कीम (सालाना $250,000 तक) के माध्यम से, US स्टॉक्स, ग्लोबल ETF और ऑफशोर फंड जैसे ग्लोबल मार्केट तक पहुँचने का एक रास्ता। यह SEBI के बजाय IFSCA द्वारा रेगुलेट किया जाता है, इसलिए हम इसे केवल एक नामित, IFSCA-पंजीकृत पार्टनर के ज़रिए ऑफर करते हैं।',
+    faq7_q:'क्या मेरा बीमा या निवेश की राशि निवेश ट्रैक द्वारा गारंटीकृत है?',
+    faq7_a:'नहीं। म्यूचुअल फंड, PMS, AIF और SIF की वैल्यू बाज़ार के साथ बदलती है और निवेश ट्रैक द्वारा गारंटीकृत नहीं है। बीमा कवर हमारे पैनल के इंश्योरर द्वारा अंडरराइट किया जाता है, निवेश ट्रैक द्वारा नहीं।',
+    faq8_q:'क्या मैं ऐप से SIP रोक या बंद कर सकता हूँ?',
+    faq8_a:'SIP में बदलाव के अनुरोध आपके रिलेशनशिप मैनेजर के माध्यम से किए जाते हैं — ऐप के सपोर्ट विकल्प या नीचे दिए गए संपर्क विवरण से संपर्क करें।',
+    ctaband_eyebrow:'जब आप तैयार हों', ctaband_h2:'एक रिलेशनशिप मैनेजर। हर सेवा के लिए।',
+    ctaband_p:'डाउनलोड मुफ़्त, पूछना मुफ़्त। KYC में कुछ ही मिनट लगते हैं — बाक़ी काम आपका रिलेशनशिप मैनेजर संभालता है।',
+    foot_brand_p:'निवेश ट्रैक, कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड है, जो 2019 से AMFI-पंजीकृत म्यूचुअल फंड डिस्ट्रीब्यूटर है।',
+    foot_services_h4:'सेवाएँ', foot_mf:'म्यूचुअल फंड व SIP', foot_pmsaif:'PMS व AIF', foot_taxestate:'टैक्स व एस्टेट प्लानिंग',
+    foot_calc_h4:'कैलकुलेटर', foot_resources_h4:'संसाधन', foot_company_h4:'कंपनी',
+    foot_row1_2:'AMFI-पंजीकृत MFD · ARN-165724',
+    foot_legal_p:'निवेश ट्रैक, कैडेंस फिनसर्व प्राइवेट लिमिटेड का एक ब्रांड, एक AMFI-पंजीकृत म्यूचुअल फंड डिस्ट्रीब्यूटर (ARN-165724) है और SEBI-पंजीकृत इन्वेस्टमेंट एडवाइज़र नहीं है। हम पूरी तरह से म्यूचुअल फंड के डिस्ट्रीब्यूटर हैं और एसेट मैनेजमेंट कंपनियों से प्रोडक्ट डिस्ट्रीब्यूटर के रूप में कमीशन कमाते हैं; हम निवेशकों से इसके लिए कोई अतिरिक्त फ़ीस नहीं लेते। म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं। स्कीमों का NAV, सिक्योरिटीज़ मार्केट को प्रभावित करने वाले कारकों और ताक़तों के आधार पर, जिनमें ब्याज दरों में उतार-चढ़ाव भी शामिल है, ऊपर या नीचे जा सकता है। निवेश से पहले सभी स्कीम से संबंधित दस्तावेज़ ध्यान से पढ़ें, जिनमें स्कीम इंफॉर्मेशन डॉक्यूमेंट और की इंफॉर्मेशन मेमोरेंडम शामिल हैं — पिछला प्रदर्शन भविष्य के प्रदर्शन का संकेत नहीं है। PMS, AIF, SIF, बीमा, टैक्स प्लानिंग, एस्टेट प्लानिंग और गिफ्ट सिटी इन्वेस्टिंग प्रत्येक अपने स्वयं के रेगुलेटर के अंतर्गत आते हैं, जो हमारे AMFI पंजीकरण से अलग है, और संबंधित पंजीकरण या पार्टनर व्यवस्था की पुष्टि होने और दर्ज होने के बाद ही ऑफर किए जाते हैं — वर्तमान स्थिति के लिए ट्रस्ट व कम्प्लायंस देखें। इस वेबसाइट को सटीक रखने की पूरी कोशिश की गई है, फिर भी यहाँ दी गई किसी भी जानकारी पर कार्य करने से पहले कृपया आधिकारिक स्कीम दस्तावेज़ों और नियामक सूचनाओं को प्रमाणिक स्रोत के रूप में देखें। इस वेबसाइट पर कुछ भी इन्वेस्टमेंट एडवाइस, सिफ़ारिश, या किसी सिक्योरिटी या स्कीम को खरीदने या बेचने का प्रस्ताव नहीं है। किसी भी स्पष्टीकरण के लिए niveshtrack@gmail.com पर लिखें।'
+  };
+  var HI_PLACEHOLDER = {
+    cb_time_ph:'जैसे शाम 6 बजे के बाद, सप्ताह के दिनों में',
+    aw_groupsize_ph:'जैसे 40 कर्मचारी',
+    aw_message_ph:'जैसे नए कर्मचारियों के लिए म्यूचुअल फंड की बुनियादी जानकारी'
+  };
+  var RISK_COPY = {
+    en:{ title:{Conservative:'Conservative investor', Moderate:'Moderate investor', Growth:'Growth investor', Aggressive:'Aggressive investor'},
+      desc:{ Conservative:'Capital protection matters most to you. Debt-oriented and low-volatility funds are likely to suit you best.',
+        Moderate:"You're comfortable with some ups and downs for better long-term returns — a balanced mix of equity and debt fits.",
+        Growth:'You can tolerate meaningful short-term swings in pursuit of long-term growth — equity-oriented funds fit well.',
+        Aggressive:"You're comfortable with high volatility in pursuit of maximum long-term growth — a higher equity and small-cap tilt fits." } },
+    hi:{ title:{Conservative:'कंज़र्वेटिव निवेशक', Moderate:'मॉडरेट निवेशक', Growth:'ग्रोथ-उन्मुख निवेशक', Aggressive:'एग्रेसिव निवेशक'},
+      desc:{ Conservative:'आपके लिए पूंजी की सुरक्षा सबसे ज़्यादा मायने रखती है। डेट-उन्मुख और कम अस्थिरता वाले फंड आपके लिए सबसे उपयुक्त हो सकते हैं।',
+        Moderate:'बेहतर लंबी अवधि के रिटर्न के लिए आप कुछ उतार-चढ़ाव सहने में सहज हैं — इक्विटी और डेट का संतुलित मिश्रण आपके लिए उपयुक्त है।',
+        Growth:'लंबी अवधि के विकास के लिए आप छोटी अवधि के बड़े उतार-चढ़ाव सहन कर सकते हैं — इक्विटी-उन्मुख फंड आपके लिए अच्छे रहेंगे।',
+        Aggressive:'अधिकतम लंबी अवधि के विकास के लिए आप उच्च अस्थिरता सहने में सहज हैं — अधिक इक्विटी और स्मॉल-कैप झुकाव आपके लिए उपयुक्त है।' } }
+  };
+
+  window.CURRENT_LANG = 'en';
+  var I18N_ORIG = new Map(), I18N_PH_ORIG = new Map();
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ I18N_ORIG.set(el, el.innerHTML); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ I18N_PH_ORIG.set(el, el.getAttribute('placeholder')); });
+
+  window.renderRiskResult = function(){
+    if(!window.lastRiskCategory) return;
+    var copy = RISK_COPY[window.CURRENT_LANG] || RISK_COPY.en;
+    document.getElementById('riskTitle').textContent = copy.title[window.lastRiskCategory];
+    document.getElementById('riskDesc').textContent = copy.desc[window.lastRiskCategory];
+  };
+
+  function setLang(lang){
+    window.CURRENT_LANG = lang;
+    document.documentElement.setAttribute('lang', lang === 'hi' ? 'hi' : 'en');
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.getAttribute('data-i18n');
+      el.innerHTML = (lang === 'hi' && HI[key]) ? HI[key] : I18N_ORIG.get(el);
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-ph');
+      el.setAttribute('placeholder', (lang === 'hi' && HI_PLACEHOLDER[key]) ? HI_PLACEHOLDER[key] : I18N_PH_ORIG.get(el));
+    });
+    document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === lang); });
+    window.renderRiskResult();
+  }
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.lang); });
+  });
+</script>
