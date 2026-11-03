@@ -20,13 +20,6 @@ import AdminLogin from "./admin/AdminLogin";
 import Dashboard from "./admin/Dashboard";
 import AdminPages from "./admin/AdminPages";
 
-import MutualFunds from "./pages/MutualFunds";
-import TaxConsultancy from "./pages/TaxConsultancy";
-import Insurance from "./pages/Insurance";
-import Loans from "./pages/Loans";
-import FDBonds from "./pages/FDBonds";
-import EstatePlanning from "./pages/EstatePlanning";
-
 function WebsiteLayout() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -34,7 +27,7 @@ function WebsiteLayout() {
 
       <main className="flex-1">
         <Routes>
-          {/* Home and Main Pages */}
+          {/* Main Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/about-us" element={<About />} />
           <Route
@@ -47,27 +40,24 @@ function WebsiteLayout() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
 
-          {/* All Services */}
+          {/* All Services Listing */}
           <Route path="/services" element={<AllServices />} />
 
-          {/* Individual Service Pages */}
-          <Route path="/mutual-funds" element={<MutualFunds />} />
-          <Route path="/tax-consultancy" element={<TaxConsultancy />} />
-          <Route path="/insurance" element={<Insurance />} />
-          <Route path="/loans" element={<Loans />} />
-          <Route path="/fd-bonds" element={<FDBonds />} />
-          <Route path="/estate-planning" element={<EstatePlanning />} />
+          {/* All Individual Service Pages */}
+          <Route path="/:slug" element={<ServiceDetail />} />
 
-          {/* Dynamic Service Pages */}
-          <Route path="/pfms" element={<ServiceDetail />} />
-          <Route path="/pms" element={<ServiceDetail />} />
-          <Route path="/aif" element={<ServiceDetail />} />
-          <Route path="/sif" element={<ServiceDetail />} />
-          <Route path="/tax-planning" element={<ServiceDetail />} />
-          <Route path="/gift-city-investing" element={<ServiceDetail />} />
-
-          {/* Unknown Website Routes */}
-          <Route path="*" element={<div className="p-10 text-center">Page Not Found</div>} />
+          {/* Unknown Routes */}
+          <Route
+            path="*"
+            element={
+              <div className="p-10 text-center">
+                <h1 className="text-2xl font-bold">Page Not Found</h1>
+                <p className="mt-2 text-slate-600">
+                  The page you are looking for does not exist.
+                </p>
+              </div>
+            }
+          />
         </Routes>
       </main>
 
@@ -86,18 +76,22 @@ export default function App() {
         {/* Admin Panel */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+
           <Route
             path="services"
             element={<AdminPages type="services" />}
           />
+
           <Route
             path="blogs"
             element={<AdminPages type="blogs" />}
           />
+
           <Route
             path="enquiries"
             element={<AdminPages type="enquiries" />}
           />
+
           <Route
             path="users"
             element={<AdminPages type="users" />}

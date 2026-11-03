@@ -6,7 +6,6 @@ import {
   Calculator,
   ShieldCheck,
   Landmark,
-  Building2,
   House,
   FileCheck,
   CheckCircle2,
@@ -40,6 +39,21 @@ const services = [
     short: "Professionally managed, concentrated portfolios for eligible investors.",
     description:
       "Explore Portfolio Management Services through our empanelled partners and understand portfolio strategies, eligibility, risks and investment requirements.",
+    icon: BriefcaseBusiness,
+    tag: "Portfolio Management",
+    benefits: [
+      "Understand Portfolio Management Services",
+      "Explore different portfolio strategies",
+      "Learn about eligibility and investment requirements",
+      "Understand associated risks and fees",
+    ],
+  },
+  {
+    slug: "pfms",
+    title: "Portfolio Management Services (PFMS)",
+    short: "Explore professionally managed portfolio solutions.",
+    description:
+      "Explore Portfolio Management Services through our empanelled partners and understand portfolio strategies, eligibility, investment requirements and associated risks.",
     icon: BriefcaseBusiness,
     tag: "Portfolio Management",
     benefits: [
@@ -189,30 +203,68 @@ const services = [
 // General Services
 const generalServices = [
   {
+    slug: "financial-planning",
     title: "Financial Planning",
+    short: "Organise your financial priorities, savings and future goals.",
     description:
-      "Organise your financial priorities, savings and future goals.",
+      "Build a clearer financial roadmap by organising your income, savings, investments, expenses and future financial goals.",
     icon: PiggyBank,
+    tag: "Financial Planning",
+    benefits: [
+      "Identify your short-term and long-term goals",
+      "Organise savings and financial priorities",
+      "Understand budgeting and cash flow",
+      "Create a structured financial roadmap",
+    ],
   },
   {
+    slug: "investment-guidance",
     title: "Investment Guidance",
+    short: "Understand investment choices, diversification and risk.",
     description:
-      "Understand investment choices, diversification and risk.",
+      "Understand different investment options, diversification and risk considerations to make informed financial decisions.",
     icon: TrendingUp,
+    tag: "Investment Guidance",
+    benefits: [
+      "Understand different investment options",
+      "Learn about diversification",
+      "Evaluate risk and investment horizon",
+      "Align investment choices with your goals",
+    ],
   },
   {
+    slug: "protection-planning",
     title: "Protection Planning",
+    short: "Review your insurance needs and financial protection priorities.",
     description:
-      "Review your insurance needs and financial protection priorities.",
+      "Review your financial protection priorities and understand how insurance can help manage unexpected financial risks.",
     icon: ShieldCheck,
+    tag: "Protection Planning",
+    benefits: [
+      "Review life and health protection needs",
+      "Understand insurance coverage",
+      "Learn about policy terms and exclusions",
+      "Organise your protection priorities",
+    ],
   },
   {
+    slug: "loan-guidance",
     title: "Loan Guidance",
+    short: "Understand borrowing options, interest and repayment commitments.",
     description:
-      "Understand borrowing options, interest and repayment commitments.",
+      "Explore borrowing options and understand interest rates, EMIs, fees and repayment commitments before making a borrowing decision.",
     icon: HandCoins,
+    tag: "Loan Guidance",
+    benefits: [
+      "Understand common loan options",
+      "Learn how interest and EMIs work",
+      "Compare repayment terms and charges",
+      "Evaluate borrowing within your budget",
+    ],
   },
 ];
+
+const allServices = [...services, ...generalServices];
 
 // Page Hero
 function PageHero({ eyebrow, title, description }) {
@@ -254,19 +306,22 @@ function PageHero({ eyebrow, title, description }) {
   );
 }
 
-// Individual Service Card
+// Fully Clickable Service Card
 function ServiceCard({ service }) {
   const Icon = service.icon;
 
   return (
-    <article className="group flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-950/5 sm:p-7">
+    <Link
+      to={`/${service.slug}`}
+      className="group flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-950/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#007A55] sm:p-7"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 transition group-hover:bg-emerald-700 group-hover:text-white">
           <Icon size={27} />
         </div>
 
         <span className="rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-slate-500">
-          {service.tag || "Financial Service"}
+          {service.tag}
         </span>
       </div>
 
@@ -275,22 +330,17 @@ function ServiceCard({ service }) {
       </h2>
 
       <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
-        {service.short || service.description}
+        {service.short}
       </p>
 
-      {service.slug && (
-        <Link
-          to={`/${service.slug}`}
-          className="mt-6 inline-flex items-center gap-2 border-t border-slate-100 pt-5 text-sm font-bold text-[#007A55]"
-        >
-          Explore Service
-          <ArrowRight
-            size={17}
-            className="transition group-hover:translate-x-1"
-          />
-        </Link>
-      )}
-    </article>
+      <span className="mt-6 inline-flex items-center gap-2 border-t border-slate-100 pt-5 text-sm font-bold text-[#007A55]">
+        Explore Service
+        <ArrowRight
+          size={17}
+          className="transition group-hover:translate-x-1"
+        />
+      </span>
+    </Link>
   );
 }
 
@@ -319,12 +369,8 @@ export function AllServices() {
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
+            {allServices.map((service) => (
               <ServiceCard key={service.slug} service={service} />
-            ))}
-
-            {generalServices.map((service) => (
-              <ServiceCard key={service.title} service={service} />
             ))}
           </div>
 
@@ -356,7 +402,7 @@ export function AllServices() {
 export default function ServiceDetail() {
   const { slug } = useParams();
 
-  const service = services.find((item) => item.slug === slug);
+  const service = allServices.find((item) => item.slug === slug);
 
   if (!service) {
     return (
