@@ -1,0 +1,27 @@
+node_modules/
+.env
+dist/
+build/
+
+# Developer handoff folder
+/nivesh-track-developer-handoff/
+node_modules/
+**/node_modules/
+
+.env
+.env.*
+!.env.example
+
+dist/
+build/
+
+.vscode/
+.idea/
+
+coverage/
+.cache/
+.vite/
+
+*.log
+
+/nivesh-track-developer-handoff/
