@@ -1,5 +1,11 @@
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -19,6 +25,21 @@ import AdminLayout from "./admin/AdminLayout";
 import AdminLogin from "./admin/AdminLogin";
 import Dashboard from "./admin/Dashboard";
 import AdminPages from "./admin/AdminPages";
+
+// Scroll to Top on Every Route Change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname]);
+
+  return null;
+}
 
 function WebsiteLayout() {
   return (
@@ -69,6 +90,8 @@ function WebsiteLayout() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
+
       <Routes>
         {/* Admin Login */}
         <Route path="/admin/login" element={<AdminLogin />} />

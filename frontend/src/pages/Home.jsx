@@ -140,41 +140,49 @@ const strategies = [
     icon: TrendingUp,
     title: "Wealth Creation",
     description: "Build long-term wealth through disciplined financial planning.",
+    path: "/pms",
   },
   {
     icon: CircleDollarSign,
     title: "Tax Saving",
     description: "Explore tax-planning options based on your circumstances.",
+    path: "/tax-planning",
   },
   {
     icon: ChartNoAxesCombined,
     title: "Mutual Funds",
     description: "Understand diversified investment options and their risks.",
+    path: "/mutual-funds",
   },
   {
     icon: Search,
     title: "Equity Investments",
     description: "Research opportunities while considering risk and time horizon.",
+    path: "/pms",
   },
   {
     icon: Target,
     title: "Retirement Planning",
     description: "Work towards a retirement plan aligned with your goals.",
+    path: "/estate-planning",
   },
   {
     icon: Landmark,
     title: "FD & Bonds",
     description: "Learn about fixed-income products and their features.",
+    path: "/fd-bonds",
   },
   {
     icon: ShieldCheck,
     title: "Risk Management",
     description: "Understand diversification and how it relates to investment risk.",
+    path: "/insurance",
   },
   {
     icon: Sparkles,
     title: "Financial Growth",
     description: "Create a financial roadmap with clear priorities and milestones.",
+    path: "/pms",
   },
 ];
 
@@ -1001,123 +1009,7 @@ function Home() {
 
       {/* STATISTICS */}
       {/* Getting Started Section */}
-{/* Getting Started Section */}
-<section className="relative isolate overflow-hidden bg-[#f3faf6] px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
 
-  {/* Same Hero Gradient - Top Right */}
-  <div className="pointer-events-none absolute -right-24 -top-20 -z-10 h-80 w-80 rounded-full bg-emerald-200/40 blur-3xl" />
-
-  {/* Same Hero Gradient - Bottom Left */}
-  <div className="pointer-events-none absolute -bottom-24 left-0 -z-10 h-72 w-72 rounded-full bg-teal-100/70 blur-3xl" />
-
-  <div className="relative z-10 mx-auto max-w-[1440px]">
-
-    {/* Heading */}
-    <div className="mx-auto max-w-2xl text-center">
-
-      <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#007A55]">
-        Getting Started
-      </p>
-
-      <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-        Four Entries to Your First SIP.
-      </h2>
-
-      <p className="mt-4 text-base leading-8 text-slate-600 sm:text-lg">
-        Start your investment journey with a simple digital process.
-        From registration to tracking, everything is designed to be easy.
-      </p>
-
-    </div>
-
-    {/* Four Steps */}
-    <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-
-      {[
-        {
-          number: "01",
-          title: "Download & register",
-          description:
-            "Get the app and sign up with your PAN and mobile number.",
-          icon: Smartphone,
-        },
-        {
-          number: "02",
-          title: "Complete self-serve e-KYC",
-          description:
-            "Verify identity digitally on our onboarding platform, in line with SEBI KYC norms.",
-          icon: ShieldCheck,
-        },
-        {
-          number: "03",
-          title: "Explore & invest",
-          description:
-            "Pick a scheme yourself, or start from our shortlist, then start a SIP.",
-          icon: TrendingUp,
-        },
-        {
-          number: "04",
-          title: "Track in one place",
-          description:
-            "Your passbook updates as transactions settle.",
-          icon: BookOpenCheck,
-        },
-      ].map((item) => {
-
-        const Icon = item.icon;
-
-        return (
-          <article
-            key={item.number}
-            className="group flex h-full flex-col rounded-2xl border border-emerald-100 bg-[#EDFCF4] p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-900/10 sm:p-7"
-          >
-
-            {/* Number & Icon */}
-            <div className="flex items-center justify-between">
-
-              <span className="text-sm font-extrabold tracking-[0.2em] text-[#007A55]">
-                ENTRY {item.number}
-              </span>
-
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#007A55]/10 text-[#007A55] transition-all duration-300 group-hover:bg-[#007A55] group-hover:text-white">
-                <Icon size={27} />
-              </div>
-
-            </div>
-
-            {/* Content */}
-            <h3 className="mt-7 text-xl font-bold leading-snug text-slate-900">
-              {item.title}
-            </h3>
-
-            <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
-              {item.description}
-            </p>
-
-            {/* Bottom Accent */}
-            <div className="mt-7 h-1 w-12 rounded-full bg-[#007A55] transition-all duration-300 group-hover:w-20" />
-
-          </article>
-        );
-      })}
-
-    </div>
-
-    {/* CTA */}
-    <div className="mt-12 text-center">
-
-      <a
-        href="/register"
-        className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#007A55] px-8 py-4 text-sm font-bold text-white shadow-lg shadow-[#007A55]/20 transition-all duration-300 hover:-translate-y-1 hover:bg-[#006447] sm:text-base"
-      >
-        Start Your SIP
-        <ArrowRight size={19} className="transition-transform duration-300 group-hover:translate-x-1" />
-      </a>
-
-    </div>
-
-  </div>
-</section>
 
       {/* WEALTH CREATION */}
       <section className="px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
