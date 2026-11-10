@@ -24,10 +24,9 @@ const calculatorGroups = [
     title: "Financial Calculators",
     description: "Plan your investments and future goals.",
     tools: [
-      { name: "SIP Calculator", desc: "Estimate monthly investment returns.", icon: TrendingUp, type: "sip" },
+      { name: "SIP Calculator", desc: "Calculate monthly SIP maturity value.", icon: TrendingUp, type: "sip" },
       { name: "Lumpsum Calculator", desc: "Calculate one-time investment growth.", icon: PiggyBank, type: "lumpsum" },
-      { name: "STP Calculator", desc: "Explore systematic transfer planning.", icon: ChartNoAxesCombined, type: "stp" },
-      { name: "SWP Calculator", desc: "Estimate regular withdrawals.", icon: Wallet, type: "swp" },
+      { name: "Step-up SIP Calculator", desc: "Increase your SIP every year and estimate the growth.", icon: TrendingUp, type: "stepup" },
       { name: "Retirement Planning", desc: "Plan your retirement corpus.", icon: Landmark, type: "retirement" },
       { name: "Delay Planning Calculator", desc: "Understand the cost of delayed investing.", icon: TrendingUp, type: "delay" },
       { name: "Life Insurance Calculator", desc: "Estimate income replacement needs.", icon: ShieldCheck, type: "insurance" },
@@ -41,15 +40,15 @@ const calculatorGroups = [
     ],
   },
   {
-    title: "MF Tools Calculators",
+    title: "Mutual Fund (MF) Calculators",
     description: "Explore mutual fund performance tools.",
     tools: [
-      { name: "SIP Performance", desc: "Explore periodic investment growth.", icon: TrendingUp, type: "sip" },
-      { name: "STP Performance", desc: "Understand systematic transfers.", icon: ChartNoAxesCombined, type: "stp" },
-      { name: "SWP Performance", desc: "Explore systematic withdrawals.", icon: Wallet, type: "swp" },
-      { name: "Scheme Performance", desc: "Compare mutual fund schemes.", icon: ChartNoAxesCombined, type: "market" },
-      { name: "Fund Performance", desc: "Review fund return scenarios.", icon: PiggyBank, type: "market" },
-      { name: "NAV Finder Calculator", desc: "Find NAV from a verified market-data source.", icon: SearchIcon, type: "market" },
+      { name: "SIP Performance", desc: "Calculate mutual fund SIP investment performance.", icon: TrendingUp, type: "mfSip" },
+      { name: "STP Performance", desc: "Calculate source-to-target mutual fund transfers.", icon: ChartNoAxesCombined, type: "mfStp" },
+      { name: "SWP Performance", desc: "Calculate mutual fund withdrawal duration and balance.", icon: Wallet, type: "mfSwp" },
+      { name: "Scheme Performance", desc: "Compare mutual fund schemes.", icon: ChartNoAxesCombined, type: "scheme" },
+      { name: "Fund Performance", desc: "Compare returns of two mutual fund schemes.", icon: PiggyBank, type: "fund" },
+      { name: "NAV Finder Calculator", desc: "Find historical NAV for a scheme and date.", icon: SearchIcon, type: "nav" },
     ],
   },
 ];
@@ -66,166 +65,188 @@ function formatINR(value) {
   }).format(Number.isFinite(value) ? value : 0);
 }
 
-function CalculatorPanel({ tool, onClose }) {
-  const [amount, setAmount] = useState("");
-  const [rate, setRate] = useState("");
-  const [years, setYears] = useState("");
-  const [extraAmount, setExtraAmount] = useState("");
-  const [inflation, setInflation] = useState("");
+function CalculatorModal({ tool, onClose }) {
+  const [values, setValues] = useState({});
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [schemeOptions, setSchemeOptions] = useState([]);
+  const type = tool.type;
+  const isMF = ["mfSip", "mfStp", "mfSwp", "market"].includes(type);
 
-  const isMarketTool = tool.type === "market";
-  const isEmi = tool.type === "emi";
-  const isTax = tool.type === "tax";
-  const isStp = tool.type === "stp";
-  const isSwp = tool.type === "swp";
-  const isGoal = tool.type === "goal";
-  const isRetirement = tool.type === "retirement";
-  const isInsurance = tool.type === "insurance";
-  const isDelay = tool.type === "delay";
-  const isSip = tool.type === "sip";
+  const set = (key, value) => {
+    setValues((old) => ({ ...old, [key]: value }));
+    setResult(null);
+    setError("");
+  };
+  const v = (key) => values[key] ?? "";
+  const n = (key) => v(key) === "" ? NaN : Number(v(key));
+  const positive = (key) => Number.isFinite(n(key)) && n(key) > 0;
+  const rateOK = (key) => Number.isFinite(n(key)) && n(key) >= 0 && n(key) <= 100;
+  const inr = (x) => formatINR(x);
+  const monthsFromYears = (y) => Math.round(y * 12);
+  const monthlyRate = (annual) => Math.pow(1 + annual / 100, 1 / 12) - 1;
+  const sipFV = (pmt, annual, months, due = false) => {
+    const r = monthlyRate(annual);
+    if (!months) return 0;
+    if (Math.abs(r) < 1e-12) return pmt * months;
+    const fv = pmt * (Math.pow(1 + r, months) - 1) / r;
+    return due ? fv * (1 + r) : fv;
+  };
+  const sipRequired = (target, annual, months) => {
+    const r = monthlyRate(annual);
+    if (!months) return NaN;
+    if (Math.abs(r) < 1e-12) return target / months;
+    return target * r / (Math.pow(1 + r, months) - 1);
+  };
 
-  const amountLabel = isEmi ? "Loan Amount (₹)" : isSip || isDelay ? "Monthly Investment (₹)" : isSwp || isStp ? "Initial Corpus (₹)" : isRetirement ? "Current Monthly Expenses (₹)" : isInsurance ? "Annual Income (₹)" : isTax ? "Annual Taxable Income (₹)" : isGoal ? "Goal Cost Today (₹)" : "Investment Amount (₹)";
-  const rateLabel = isEmi ? "Annual Interest Rate (%)" : isTax ? "Tax calculation" : isGoal || isRetirement ? "Annual Inflation (%)" : isInsurance ? "Existing Life Cover (₹)" : "Expected Annual Return (%)";
-  const yearsLabel = isTax ? "Tax estimate" : isInsurance ? "Income replacement period (years)" : isRetirement ? "Years until retirement" : isGoal ? "Years until goal" : isDelay ? "Investment horizon (years)" : "Duration (years)";
-  const extraLabel = isStp ? "Monthly Transfer Amount (₹)" : isSwp ? "Monthly Withdrawal (₹)" : isInsurance ? "Existing Life Cover (₹, optional)" : "";
+  const fieldsByType = {
+    sip: [
+      ["monthly", "Monthly SIP amount (₹)"], ["rate", "Expected annual return (%)"], ["years", "Investment period (years)"]
+    ],
+    lumpsum: [["principal", "One-time investment (₹)"], ["rate", "Expected annual return (%)"], ["years", "Investment period (years)"]],
+    stepup: [["monthly", "Starting monthly SIP (₹)"], ["step", "Annual SIP step-up (%)"], ["rate", "Expected annual return (%)"], ["years", "Investment period (years)"]],
+    retirement: [["age", "Current age (years)"], ["retireAge", "Retirement age (years)"], ["expense", "Current monthly household expenses (₹)"], ["retireYears", "Years in retirement"], ["inflation", "Annual expense inflation (%)"], ["preRate", "Pre-retirement annual return (%)"], ["postRate", "Post-retirement annual return (%)"]],
+    delay: [["monthly", "Monthly SIP amount (₹)"], ["rate", "Expected annual return (%)"], ["years", "Total goal period (years)"], ["delay", "Delay before starting (years)"]],
+    insurance: [["income", "Annual income to replace (₹)"], ["replaceYears", "Income replacement period (years)"], ["loans", "Outstanding loans/liabilities (₹)"], ["goals", "Future family goals (₹)"], ["assets", "Liquid assets available (₹)"], ["cover", "Existing life cover (₹)"]],
+    emi: [["principal", "Loan amount (₹)"], ["rate", "Annual interest rate (%)"], ["years", "Loan tenure (years)"]],
+    tax: [["income", "Annual gross salary (₹)"], ["deduction", "Standard deduction (₹) — default 75000"]],
+    goal: [["goalCost", "Goal cost today (₹)"], ["years", "Years until goal"], ["inflation", "Expected annual inflation (%)"], ["rate", "Expected annual investment return (%)"]],
+    mfSip: [["scheme", "MF scheme code"], ["monthly", "Monthly SIP amount (₹)"], ["start", "SIP start date (YYYY-MM-DD)"], ["end", "Valuation date (YYYY-MM-DD)"]],
+    mfStp: [["source", "Source scheme code"], ["target", "Target scheme code"], ["corpus", "Initial source investment (₹)"], ["transfer", "Monthly transfer (₹)"], ["start", "STP start date (YYYY-MM-DD)"], ["end", "Valuation date (YYYY-MM-DD)"]],
+    mfSwp: [["scheme", "MF scheme code"], ["corpus", "Initial investment (₹)"], ["withdrawal", "Monthly withdrawal (₹)"], ["start", "SWP start date (YYYY-MM-DD)"], ["end", "Valuation date (YYYY-MM-DD)"]],
+    scheme: [["scheme", "MF scheme code"], ["start", "Start date (YYYY-MM-DD)"], ["end", "End date (YYYY-MM-DD)"]],
+    fund: [["scheme1", "First fund scheme code"], ["scheme2", "Second fund scheme code"], ["start", "Start date (YYYY-MM-DD)"], ["end", "End date (YYYY-MM-DD)"]],
+    nav: [["scheme", "MF scheme code"], ["date", "NAV date (YYYY-MM-DD)"]],
+  };
 
-  const calculation = useMemo(() => {
-    const P = amount === "" ? NaN : Number(amount);
-    const R = rate === "" ? NaN : Number(rate);
-    const Y = years === "" ? NaN : Number(years);
-    const X = extraAmount === "" ? NaN : Number(extraAmount);
-    if (isMarketTool) return { ready: false, market: true, message: "Live NAV and actual mutual-fund performance need a verified market-data API. No fabricated market values are shown." };
-    if (!Number.isFinite(P) || P <= 0) return { ready: false, message: "Enter an amount greater than zero." };
-    if (isTax) {
-      const slabs = [[400000, 0], [800000, 0.05], [1200000, 0.10], [1600000, 0.15], [2000000, 0.20], [2400000, 0.25], [Infinity, 0.30]];
-      let lower = 0; let tax = 0;
-      for (const [upper, slabRate] of slabs) { tax += Math.max(0, Math.min(P, upper) - lower) * slabRate; lower = upper; if (P <= upper) break; }
-      return { ready: true, result: tax * 1.04, label: "Estimated tax + 4% cess", invested: null, gain: null, schedule: [], note: "Basic new-regime slab estimate only. Rebate, deductions, special-rate income and marginal relief are excluded. Verify with the official tax calculator." };
+  const goalName = tool.name.replace(" Calculator", "");
+  const fields = fieldsByType[type] || (type === "homeEmi" ? fieldsByType.emi : fieldsByType.goal);
+
+  const calculateFinancial = () => {
+    setError("");
+    const required = (keys) => keys.every((key) => v(key) !== "" && Number.isFinite(Number(v(key))));
+    const positiveKeys = (keys) => keys.every(positive);
+    const validRates = (keys) => keys.every(rateOK);
+    let out;
+
+    if (type === "sip") {
+      if (!positiveKeys(["monthly", "years"]) || !rateOK("rate")) return setError("Enter a positive SIP and duration, and a return rate from 0–100%.");
+      const months = monthsFromYears(n("years"));
+      const invested = n("monthly") * months;
+      const value = sipFV(n("monthly"), n("rate"), months);
+      out = { title: "SIP maturity value", value, invested, gain: value - invested, details: `Monthly SIP: ${inr(n("monthly"))}; ${months} instalments; assumed annual return ${n("rate")}%` };
+    } else if (type === "lumpsum") {
+      if (!positiveKeys(["principal", "years"]) || !rateOK("rate")) return setError("Enter a positive investment and duration, and a return rate from 0–100%.");
+      const value = n("principal") * Math.pow(1 + n("rate") / 100, n("years"));
+      out = { title: "Lumpsum maturity value", value, invested: n("principal"), gain: value - n("principal"), details: "Annual compounding on a single initial investment." };
+    } else if (type === "stepup") {
+      if (!positiveKeys(["monthly", "years"]) || !validRates(["step", "rate"])) return setError("Enter a positive starting SIP and duration; step-up and return must be 0–100%.");
+      const months = monthsFromYears(n("years")); const mr = monthlyRate(n("rate")); let value = 0; let invested = 0;
+      for (let m = 0; m < months; m++) { const payment = n("monthly") * Math.pow(1 + n("step") / 100, Math.floor(m / 12)); value = (value + payment) * (1 + mr); invested += payment; }
+      out = { title: "Step-up SIP maturity value", value, invested, gain: value - invested, details: `Starting SIP ${inr(n("monthly"))}, stepped up ${n("step")}% after every 12 instalments.` };
+    } else if (type === "retirement") {
+      if (!positiveKeys(["age", "retireAge", "expense", "retireYears"]) || n("retireAge") <= n("age") || !validRates(["inflation", "preRate", "postRate"])) return setError("Check ages, monthly expenses, retirement duration and all return/inflation rates.");
+      const yearsToRetire = n("retireAge") - n("age"); const g = n("inflation") / 100; const r = n("postRate") / 100;
+      const firstAnnualExpense = n("expense") * 12 * Math.pow(1 + g, yearsToRetire);
+      let corpus = 0;
+      for (let y = 0; y < n("retireYears"); y++) corpus += firstAnnualExpense * Math.pow(1 + g, y) / Math.pow(1 + r, y);
+      const months = yearsToRetire * 12; const monthlySIP = sipRequired(corpus, n("preRate"), months);
+      out = { title: "Required retirement corpus", value: corpus, invested: monthlySIP * months, gain: null, extra: `Required monthly SIP until retirement: ${inr(monthlySIP)}. First-year retirement expense: ${inr(firstAnnualExpense)} per year.`, details: "Annual expenses are inflated until retirement and then modeled as beginning-of-year withdrawals, with the post-retirement return discounted annually." };
+    } else if (type === "delay") {
+      if (!positiveKeys(["monthly", "years", "delay"]) || !rateOK("rate") || n("delay") >= n("years")) return setError("Delay must be positive and shorter than the total goal period.");
+      const total = monthsFromYears(n("years")); const delayed = monthsFromYears(n("years") - n("delay"));
+      const startNow = sipFV(n("monthly"), n("rate"), total); const startLater = sipFV(n("monthly"), n("rate"), delayed);
+      out = { title: "Value if SIP starts today", value: startNow, invested: n("monthly") * total, gain: startNow - n("monthly") * total, extra: `Value after delaying ${n("delay")} years: ${inr(startLater)}. Estimated opportunity gap: ${inr(startNow - startLater)}.`, details: "Both plans are valued on the same final date; the delayed plan makes fewer monthly contributions." };
+    } else if (type === "insurance") {
+      if (!positiveKeys(["income", "replaceYears"]) || !required(["loans", "goals", "assets", "cover"]) || ["loans", "goals", "assets", "cover"].some(k => n(k) < 0)) return setError("Enter annual income, replacement years, liabilities, goals, assets and existing cover. Use 0 where not applicable.");
+      const need = Math.max(0, n("income") * n("replaceYears") + n("loans") + n("goals") - n("assets") - n("cover"));
+      out = { title: "Estimated additional life cover needed", value: need, details: "Income replacement + outstanding liabilities + future family goals − liquid assets − existing life cover. This is a needs estimate, not an insurance recommendation." };
+    } else if (type === "emi" || type === "homeEmi") {
+      if (!positiveKeys(["principal", "years"]) || !rateOK("rate")) return setError("Enter a positive loan amount and tenure, and interest rate from 0–100%.");
+      const months = monthsFromYears(n("years")); const r = monthlyRate(n("rate")); const emi = r === 0 ? n("principal") / months : n("principal") * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1); const total = emi * months;
+      out = { title: "Monthly loan EMI", value: emi, invested: n("principal"), gain: total - n("principal"), extra: `Total repayment: ${inr(total)} over ${months} months.`, details: "Reducing-balance EMI formula; assumes a fixed rate for the full tenure." };
+    } else if (type === "tax") {
+      if (!positive("income") || v("deduction") === "" || n("deduction") < 0) return setError("Enter annual salary and standard deduction (enter 0 if not applicable).");
+      const taxable = Math.max(0, n("income") - n("deduction")); const slabs = [[400000,0],[800000,.05],[1200000,.10],[1600000,.15],[2000000,.20],[2400000,.25],[Infinity,.30]]; let base = 0, tax = 0;
+      for (const [limit, pct] of slabs) { tax += Math.max(0, Math.min(taxable, limit) - base) * pct; base = limit; if (taxable <= limit) break; }
+      let rebate = taxable <= 1200000 ? Math.min(tax, 60000) : 0;
+      if (taxable > 1200000) rebate = Math.max(0, tax - (taxable - 1200000));
+      const beforeCess = Math.max(0, tax - rebate); const totalTax = beforeCess * 1.04;
+      out = { title: "Estimated new-regime income tax", value: totalTax, extra: `Taxable income: ${inr(taxable)}; tax before cess: ${inr(beforeCess)}; 4% cess included.`, details: "Illustrative resident-individual salary estimate for tax year 2026–27 using ₹4L–₹24L new-regime slabs, ₹75,000 standard deduction as entered, Section 87A rebate and marginal relief. Surcharge, special-rate income and other adjustments are excluded; verify with the official tax portal." };
+    } else if (type === "goal") {
+      if (!positiveKeys(["goalCost", "years"]) || !validRates(["inflation", "rate"])) return setError("Enter goal cost, time horizon and inflation/return rates (0–100%).");
+      const futureCost = n("goalCost") * Math.pow(1 + n("inflation") / 100, n("years")); const months = monthsFromYears(n("years")); const sip = sipRequired(futureCost, n("rate"), months);
+      out = { title: `${goalName} — future goal cost`, value: futureCost, extra: `Monthly SIP required to target this amount: ${inr(sip)}.`, details: `Future cost is inflated at ${n("inflation")}% annually; required monthly investment assumes ${n("rate")}% annual return and month-end instalments.` };
     }
-    if (!Number.isFinite(Y) || Y <= 0) return { ready: false, message: isSwp ? "Enter withdrawal period in months." : "Enter a duration greater than zero." };
-    if (isRetirement && (!Number.isFinite(Number(inflation)) || Number(inflation) <= 0)) return { ready: false, message: "Enter the number of years you expect to spend in retirement." };
-    if (!Number.isFinite(R) || R < 0) return { ready: false, message: "Enter a valid rate (zero or greater)." };
-    const months = Math.min(1200, Math.max(1, Math.round(Y * 12)));
-    const monthlyRate = R / 1200;
-    let schedule = [];
+    setResult(out);
+  };
 
-    if (isInsurance) {
-      const cover = Number.isFinite(X) && X > 0 ? X : 0;
-      return { ready: true, result: Math.max(0, P * Y - cover), label: "Indicative Additional Cover", invested: null, gain: null, schedule: [], note: "Simple estimate: annual income × replacement years − existing cover. Debts, assets, dependants' goals and policy details are excluded." };
-    }
-    if (isEmi) {
-      const factor = Math.pow(1 + monthlyRate, months);
-      const emi = monthlyRate === 0 ? P / months : (P * monthlyRate * factor) / (factor - 1);
-      let balance = P;
-      for (let i = 1; i <= months && balance > 0.005; i++) {
-        const opening = balance; const interest = opening * monthlyRate; const principalPaid = Math.min(opening, Math.max(0, emi - interest)); balance = Math.max(0, opening - principalPaid);
-        schedule.push({ period: `Month ${i}`, opening, cashFlow: -Math.min(emi, opening + interest), interest, closing: balance });
+  const fetchScheme = async (code) => {
+    const response = await fetch(`https://api.mfapi.in/mf/${encodeURIComponent(code)}`);
+    if (!response.ok) throw new Error(`MF API request failed (${response.status}). Check the scheme code or try again.`);
+    const json = await response.json();
+    if (!json.data || !Array.isArray(json.data) || !json.data.length) throw new Error("No NAV history returned for this scheme.");
+    return { meta: json.meta, data: json.data.map(x => ({ date: parseMFDate(x.date), nav: Number(x.nav) })).filter(x => x.date && Number.isFinite(x.nav) && x.nav > 0).sort((a,b) => a.date - b.date) };
+  };
+  const parseMFDate = (s) => { const [d,m,y] = String(s).split("-").map(Number); return new Date(y, m - 1, d); };
+  const dateKey = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const findNav = (rows, date) => { const target = new Date(`${date}T00:00:00`); let found = null; for (const row of rows) { if (row.date <= target) found = row; else break; } return found; };
+  const dateRange = (start, end) => { const s = new Date(`${start}T00:00:00`); const e = new Date(`${end}T00:00:00`); if (!start || !end || Number.isNaN(+s) || Number.isNaN(+e) || s >= e) throw new Error("Enter valid dates; end date must be after start date."); return { s, e }; };
+
+  const calculateMF = async () => {
+    setLoading(true); setError(""); setResult(null);
+    try {
+      let out;
+      if (type === "nav") {
+        if (!v("scheme") || !v("date")) throw new Error("Enter scheme code and NAV date.");
+        const fund = await fetchScheme(v("scheme")); const nav = findNav(fund.data, v("date"));
+        if (!nav) throw new Error("NAV is not available on or before this date.");
+        out = { title: "NAV on selected date", value: nav.nav, extra: `${fund.meta?.scheme_name || "Scheme"} · ${nav.date.toLocaleDateString("en-IN")}`, details: "NAV is taken from the most recent published NAV on or before the selected date." };
+      } else if (type === "scheme") {
+        if (!v("scheme")) throw new Error("Enter a scheme code."); const { s, e } = dateRange(v("start"), v("end")); const fund = await fetchScheme(v("scheme")); const a = findNav(fund.data, v("start")); const b = findNav(fund.data, v("end"));
+        if (!a || !b || a.nav <= 0) throw new Error("NAV data is unavailable for the selected dates."); const abs = (b.nav / a.nav - 1) * 100; const days = (b.date - a.date) / 86400000; const cagr = days > 0 ? (Math.pow(b.nav / a.nav, 365.25 / days) - 1) * 100 : 0;
+        out = { title: "Scheme performance", value: abs, suffix: "% absolute return", extra: `${fund.meta?.scheme_name || "Scheme"}; start NAV ${a.nav.toFixed(4)} (${a.date.toLocaleDateString("en-IN")}); end NAV ${b.nav.toFixed(4)} (${b.date.toLocaleDateString("en-IN")}); CAGR ${cagr.toFixed(2)}%.`, details: "NAV-to-NAV return for the selected period. CAGR annualizes the same NAV change; it is not a total-return index and excludes investor taxes/loads." };
+      } else if (type === "fund") {
+        if (!v("scheme1") || !v("scheme2")) throw new Error("Enter both scheme codes."); dateRange(v("start"), v("end")); const [f1,f2] = await Promise.all([fetchScheme(v("scheme1")), fetchScheme(v("scheme2"))]);
+        const a1 = findNav(f1.data,v("start")), b1 = findNav(f1.data,v("end")), a2 = findNav(f2.data,v("start")), b2 = findNav(f2.data,v("end")); if (![a1,b1,a2,b2].every(Boolean)) throw new Error("One or both funds do not have NAV for the selected period.");
+        const r1 = (b1.nav/a1.nav-1)*100, r2 = (b2.nav/a2.nav-1)*100;
+        out = { title: "Fund comparison — absolute NAV return", value: r1, suffix: "% — Fund 1", extra: `${f1.meta?.scheme_name || v("scheme1")}: ${r1.toFixed(2)}%; ${f2.meta?.scheme_name || v("scheme2")}: ${r2.toFixed(2)}%.`, details: "Compares NAV-to-NAV percentage returns over identical dates. Compare like-for-like plan, option and category; past performance does not predict future returns." };
+      } else if (type === "mfSip") {
+        if (!v("scheme") || !positive("monthly")) throw new Error("Enter scheme code and monthly SIP amount."); dateRange(v("start"),v("end")); const fund = await fetchScheme(v("scheme")); let units = 0, invested = 0, count = 0; const start = new Date(`${v("start")}T00:00:00`), end = new Date(`${v("end")}T00:00:00`);
+        for (let d = new Date(start); d <= end; d.setMonth(d.getMonth()+1)) { const nav = findNav(fund.data, dateKey(d)); if (nav) { units += n("monthly")/nav.nav; invested += n("monthly"); count++; } }
+        const last = findNav(fund.data,v("end")); if (!count || !last) throw new Error("No matching monthly NAV dates found in this period."); const value = units*last.nav;
+        out = { title: "Historical MF SIP value", value, invested, gain: value-invested, extra: `${fund.meta?.scheme_name || "Scheme"}; instalments: ${count}; units accumulated: ${units.toFixed(4)}; latest NAV: ${last.nav.toFixed(4)}.`, details: "Historical simulation: each monthly instalment buys units at the most recent available NAV on or before that monthly date. SIP date convention is approximate; actual allotment follows scheme cut-off and business-day rules." };
+      } else if (type === "mfStp") {
+        if (!v("source") || !v("target") || !positive("corpus") || !positive("transfer")) throw new Error("Enter source and target scheme codes, initial corpus and monthly transfer."); dateRange(v("start"),v("end")); const [src,dst] = await Promise.all([fetchScheme(v("source")),fetchScheme(v("target"))]); const first = findNav(src.data,v("start")); if (!first) throw new Error("Source fund has no NAV for start date."); let sourceUnits=n("corpus")/first.nav, targetUnits=0, transferred=0, count=0; const start=new Date(`${v("start")}T00:00:00`), end=new Date(`${v("end")}T00:00:00`);
+        for(let d=new Date(start.getFullYear(),start.getMonth()+1,start.getDate()); d<=end; d.setMonth(d.getMonth()+1)){ const date=dateKey(d); const sn=findNav(src.data,date), tn=findNav(dst.data,date); if(!sn||!tn) continue; const amount=Math.min(n("transfer"),sourceUnits*sn.nav); sourceUnits-=amount/sn.nav; targetUnits+=amount/tn.nav; transferred+=amount; count++; }
+        const sLast=findNav(src.data,v("end")), tLast=findNav(dst.data,v("end")); if(!sLast||!tLast) throw new Error("NAV unavailable on valuation date."); const sourceValue=sourceUnits*sLast.nav, targetValue=targetUnits*tLast.nav;
+        out={title:"Historical STP portfolio value",value:sourceValue+targetValue,extra:`Source value ${inr(sourceValue)}; target value ${inr(targetValue)}; amount transferred ${inr(transferred)}; transfer cycles ${count}.`,details:"Historical simulation: fixed rupee transfers redeem source-fund units at source NAV and purchase target-fund units at target NAV. Taxes, exit loads and actual STP processing dates are excluded."};
+      } else if (type === "mfSwp") {
+        if (!v("scheme") || !positive("corpus") || !positive("withdrawal")) throw new Error("Enter scheme code, initial corpus and monthly withdrawal."); dateRange(v("start"),v("end")); const fund=await fetchScheme(v("scheme")); const first=findNav(fund.data,v("start")); if(!first) throw new Error("No NAV for selected start date."); let units=n("corpus")/first.nav, total=0, count=0; const start=new Date(`${v("start")}T00:00:00`), end=new Date(`${v("end")}T00:00:00`);
+        for(let d=new Date(start.getFullYear(),start.getMonth()+1,start.getDate());d<=end;d.setMonth(d.getMonth()+1)){const nav=findNav(fund.data,dateKey(d));if(!nav)continue;const amount=Math.min(n("withdrawal"),units*nav.nav);units-=amount/nav.nav;total+=amount;count++;if(units<=0)break;}
+        const last=findNav(fund.data,v("end")); const remaining=last?units*last.nav:0; out={title:"Historical SWP remaining value",value:remaining,extra:`Total withdrawn ${inr(total)} across ${count} withdrawal cycles; remaining units ${units.toFixed(4)}.`,details:"Historical simulation: monthly withdrawals redeem units at the most recent available NAV on or before each scheduled date. Tax, exit loads and actual business-day processing are excluded."};
       }
-      return { ready: true, result: emi, label: "Estimated Monthly EMI", invested: P, gain: Math.max(0, emi * months - P), schedule, note: "Fixed-rate amortization estimate. Fees, lender-specific rounding and changing interest rates are excluded." };
-    }
-    if (tool.type === "lumpsum") {
-      let balance = P;
-      const effectiveMonthlyRate = Math.pow(1 + R / 100, 1 / 12) - 1;
-      for (let i = 1; i <= months; i++) { const opening = balance; const gain = opening * effectiveMonthlyRate; balance += gain; schedule.push({ period: `Month ${i}`, opening, cashFlow: 0, interest: gain, closing: balance }); }
-      return { ready: true, result: balance, label: "Estimated Future Value", invested: P, gain: balance - P, schedule, note: "Uses an effective monthly rate equivalent to the entered annual return. Actual investment returns are not guaranteed." };
-    }
-    if (isSip || isDelay) {
-      let balance = 0; let invested = 0;
-      for (let i = 1; i <= months; i++) { const opening = balance; const gain = opening * monthlyRate; const contribution = P; balance = opening + gain + contribution; invested += contribution; schedule.push({ period: `Month ${i}`, opening, cashFlow: contribution, interest: gain, closing: balance }); }
-      const fv = balance;
-      if (isDelay) {
-        const delayedMonths = Math.max(0, months - 12); let delayed = 0;
-        for (let i = 0; i < delayedMonths; i++) delayed = delayed * (1 + monthlyRate) + P;
-        return { ready: true, result: fv, label: "Value if You Start Now", invested, gain: fv - invested, extraLabel: `Estimated value if you delay by 1 year: ${formatINR(delayed)}`, schedule, note: "Month-end contributions and constant returns assumed. Real returns are not guaranteed." };
-      }
-      return { ready: true, result: fv, label: "Estimated Future Value", invested, gain: fv - invested, schedule, note: "Month-end SIP contributions assumed, with a constant monthly return derived from the annual rate." };
-    }
-    if (isSwp) {
-      if (!Number.isFinite(X) || X <= 0) return { ready: false, message: "Enter a monthly withdrawal greater than zero." };
-      let balance = P; let totalWithdrawn = 0; let totalGain = 0;
-      for (let i = 1; i <= months; i++) {
-        const opening = balance; const interest = opening * monthlyRate; const available = opening + interest; const withdrawal = Math.min(X, available); balance = Math.max(0, available - withdrawal); totalWithdrawn += withdrawal; totalGain += interest;
-        schedule.push({ period: `Month ${i}`, opening, cashFlow: -withdrawal, interest, closing: balance });
-      }
-      return { ready: true, result: balance, label: "Estimated Remaining Corpus", invested: P, gain: totalGain, totalWithdrawn, totalValue: balance + totalWithdrawn, schedule, note: "Monthly return is credited before each withdrawal. Withdrawal stops when the corpus is exhausted; actual returns and tax may differ." };
-    }
-    if (isStp) {
-      if (!Number.isFinite(X) || X <= 0) return { ready: false, message: "Enter a monthly transfer greater than zero." };
-      let source = P; let target = 0;
-      for (let i = 1; i <= months; i++) { const opening = source + target; const sourceGrowth = source * monthlyRate; const targetGrowth = target * monthlyRate; const transfer = Math.min(X, source + sourceGrowth); source = Math.max(0, source + sourceGrowth - transfer); target = target + targetGrowth + transfer; schedule.push({ period: `Month ${i}`, opening, cashFlow: 0, interest: sourceGrowth + targetGrowth, closing: source + target, detail: `Transfer ${formatINR(transfer)}` }); }
-      return { ready: true, result: source + target, label: "Estimated Combined Value", invested: P, gain: source + target - P, schedule, note: "Illustrative model assumes source and target funds earn the same return. Actual STP depends on fund NAVs, taxes and exit loads." };
-    }
-    if (isGoal) {
-      const inflationRate = R / 1200; let futureCost = P;
-      for (let i = 0; i < months; i++) futureCost *= (1 + inflationRate);
-      const investRate = 0.12 / 12; const sip = investRate === 0 ? futureCost / months : futureCost * investRate / (Math.pow(1 + investRate, months) - 1);
-      let balance = 0;
-      for (let i = 1; i <= months; i++) { const opening = balance; const interest = opening * investRate; balance = opening + interest + sip; schedule.push({ period: `Month ${i}`, opening, cashFlow: sip, interest, closing: balance }); }
-      return { ready: true, result: futureCost, label: "Estimated Future Goal Cost", invested: null, gain: null, requiredSip: sip, schedule, note: "Future cost uses the entered inflation rate. Required SIP assumes a separate illustrative 12% annual investment return." };
-    }
-    if (isRetirement) {
-      const inflationRate = R / 100; const retirementMonthlyExpense = P * Math.pow(1 + inflationRate, Y); const retirementYears = Number(inflation); const postMonthlyRate = 0.06 / 12; const retirementMonths = Math.round(retirementYears * 12);
-      const corpus = postMonthlyRate === 0 ? retirementMonthlyExpense * retirementMonths : retirementMonthlyExpense * (1 - Math.pow(1 + postMonthlyRate, -retirementMonths)) / postMonthlyRate;
-      const accumulationRate = 0.12 / 12; const sip = accumulationRate === 0 ? corpus / months : corpus * accumulationRate / (Math.pow(1 + accumulationRate, months) - 1); let balance = 0;
-      for (let i = 1; i <= months; i++) { const opening = balance; const interest = opening * accumulationRate; balance = opening + interest + sip; schedule.push({ period: `Month ${i}`, opening, cashFlow: sip, interest, closing: balance }); }
-      return { ready: true, result: corpus, label: "Illustrative Retirement Corpus", invested: null, gain: null, requiredSip: sip, extraLabel: `Monthly expense at retirement: ${formatINR(retirementMonthlyExpense)} · Retirement years assumed: ${retirementYears}`, schedule, note: "Assumes 6% annual return during retirement and 12% annual accumulation return. Adjust assumptions to your circumstances." };
-    }
-    return { ready: false, message: "This calculator is not configured yet." };
-  }, [amount, rate, years, extraAmount, inflation, tool.type, isMarketTool, isTax, isEmi, isInsurance, isSip, isDelay, isSwp, isStp, isGoal, isRetirement]);
+      setResult(out);
+    } catch (e) { setError(e.message || "Unable to calculate with the selected data."); }
+    finally { setLoading(false); }
+  };
 
-  const reset = () => { setAmount(""); setRate(""); setYears(""); setExtraAmount(""); setInflation(""); };
-  const Icon = tool.icon;
-  const maxClosing = calculation.schedule?.length ? Math.max(1, ...calculation.schedule.map((row) => row.closing)) : 1;
-  const schedule = calculation.schedule || [];
-  const chartSchedule = schedule.length <= 12
-    ? schedule
-    : Array.from({ length: 12 }, (_, index) => schedule[Math.round(index * (schedule.length - 1) / 11)]).filter(Boolean);
+  const marketTypes = ["mfSip","mfStp","mfSwp","scheme","fund","nav"];
+  const showMarket = marketTypes.includes(type);
+  const submit = () => showMarket ? calculateMF() : calculateFinancial();
 
   return (
-    <section id="active-calculator" className="mt-12 scroll-mt-24 overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-xl shadow-emerald-950/5">
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 bg-slate-50 px-5 py-5 sm:px-8">
-        <div className="flex items-start gap-3">
-          <span className="rounded-xl bg-emerald-100 p-3 text-emerald-800"><Icon size={24} /></span>
-          <div><p className="text-xs font-bold uppercase tracking-widest text-emerald-700">Interactive calculator</p><h3 className="mt-1 text-2xl font-bold text-slate-900">{tool.name}</h3><p className="mt-1 text-sm text-slate-500">{tool.desc}</p></div>
-        </div>
-        <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Close ✕</button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label={tool.name} className="my-6 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl sm:p-8" onClick={(e)=>e.stopPropagation()}>
+        <div className="mb-6 flex items-start justify-between gap-4"><div><span className="mb-3 inline-flex rounded-xl bg-emerald-50 p-3 text-emerald-700"><Calculator size={24}/></span><h2 className="text-2xl font-bold text-slate-900">{tool.name}</h2><p className="mt-2 text-sm text-slate-500">{tool.desc}</p></div><button type="button" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100" aria-label="Close calculator">✕</button></div>
+        <div className="grid gap-4 sm:grid-cols-2">{fields.map(([key,label])=><div key={key}><label className="mb-2 block text-sm font-semibold text-slate-700">{label}</label><input type={key==="start"||key==="end"||key==="date"?"date":"number"} inputMode="decimal" min="0" step="any" value={v(key)} onChange={e=>set(key,e.target.value)} placeholder={key.includes("scheme")||key==="source"||key==="target"?"Enter scheme code":"Enter value"} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"/></div>)}</div>
+        <button type="button" onClick={submit} disabled={loading} className="mt-6 w-full rounded-xl bg-emerald-700 px-5 py-3.5 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-60">{loading?"Fetching NAV data…":showMarket?"Fetch NAV & Calculate":"Calculate"}</button>
+        {error && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        {result && <div className="mt-6 rounded-2xl bg-gradient-to-br from-emerald-800 to-teal-700 p-5 text-white"><p className="text-sm text-emerald-100">{result.title}</p><p className="mt-2 break-words text-3xl font-bold">{result.suffix?`${result.value.toFixed(2)} ${result.suffix}`:inr(result.value)}</p>{result.invested!==undefined&&<div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/20 pt-4"><div><p className="text-xs text-emerald-100">Invested / Principal</p><p className="mt-1 font-semibold">{inr(result.invested)}</p></div><div><p className="text-xs text-emerald-100">Gain / Loss</p><p className="mt-1 font-semibold">{inr(result.gain)}</p></div></div>}{result.extra&&<p className="mt-3 text-sm text-emerald-100">{result.extra}</p>}<p className="mt-4 border-t border-white/20 pt-3 text-xs leading-5 text-emerald-50">{result.details}</p></div>}
+        <p className="mt-4 text-xs leading-5 text-slate-500">Planning estimates only. Investment returns are not guaranteed. MF historical results use MFAPI.in NAV data and are not a substitute for official account statements, transaction NAVs or tax calculations.</p>
       </div>
-
-      <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <div className="rounded-2xl border border-slate-200 p-5 sm:p-6">
-          <div className="mb-5 flex items-center justify-between"><h4 className="text-lg font-bold text-slate-900">Calculator inputs</h4><button type="button" onClick={reset} className="text-sm font-semibold text-emerald-700 hover:underline">Reset</button></div>
-          {isMarketTool ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"><p className="font-semibold">Live market data required</p><p className="mt-1">NAV and actual scheme/fund performance need a verified market-data API. No sample values are presented as real data.</p></div> : <div className="space-y-4">
-            <div><label className="mb-2 block text-sm font-semibold text-slate-700">{amountLabel}</label><input type="number" min="0" step="any" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100" /></div>
-            {!isTax && <div><label className="mb-2 block text-sm font-semibold text-slate-700">{rateLabel}</label>{isInsurance ? <p className="rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">Enter existing cover in the optional field below.</p> : <input type="number" min="0" step="any" inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="Enter rate (%)" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100" />}</div>}
-            {!isTax && <div><label className="mb-2 block text-sm font-semibold text-slate-700">{yearsLabel}</label><input type="number" min={isSwp ? "1" : "0.1"} step="any" inputMode="decimal" value={years} onChange={(e) => setYears(e.target.value)} placeholder="Enter years (e.g. 5)" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100" /></div>}
-            {extraLabel && <div><label className="mb-2 block text-sm font-semibold text-slate-700">{extraLabel}</label><input type="number" min="0" step="any" inputMode="decimal" value={extraAmount} onChange={(e) => setExtraAmount(e.target.value)} placeholder={isInsurance ? "Enter existing cover (optional)" : "Enter monthly amount"} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100" /></div>}
-            {isRetirement && <div><label className="mb-2 block text-sm font-semibold text-slate-700">Years spent in retirement</label><input type="number" min="1" max="50" value={inflation} onChange={(e) => setInflation(e.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100" /></div>}
-          </div>}
-          <p className="mt-5 text-xs leading-5 text-slate-500">All outputs are indicative estimates based on standard finance formulas. Values remain blank until you enter the required inputs.</p>
-        </div>
-
-        <div className="rounded-2xl bg-gradient-to-br from-[#063d34] to-emerald-700 p-5 text-white sm:p-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-emerald-100">Your calculation</p>
-          {calculation.ready ? <><p className="mt-3 text-sm text-emerald-100">{calculation.label}</p><p className="mt-1 break-words text-3xl font-bold sm:text-4xl">{formatINR(calculation.result)}</p>
-            <div className="mt-6 grid grid-cols-2 gap-3">{calculation.invested != null && <div className="rounded-xl bg-white/10 p-3"><p className="text-xs text-emerald-100">{isEmi ? "Loan Principal" : "Principal / Invested"}</p><p className="mt-1 font-bold">{formatINR(calculation.invested)}</p></div>}{calculation.gain != null && <div className="rounded-xl bg-white/10 p-3"><p className="text-xs text-emerald-100">{isEmi ? "Total Interest" : "Gain / Interest"}</p><p className="mt-1 font-bold">{formatINR(calculation.gain)}</p></div>}{calculation.totalWithdrawn != null && <div className="rounded-xl bg-white/10 p-3"><p className="text-xs text-emerald-100">Total Withdrawn</p><p className="mt-1 font-bold">{formatINR(calculation.totalWithdrawn)}</p></div>}{calculation.totalValue != null && <div className="rounded-xl bg-white/10 p-3"><p className="text-xs text-emerald-100">Total Value</p><p className="mt-1 font-bold">{formatINR(calculation.totalValue)}</p></div>}</div>
-            {calculation.requiredSip != null && <p className="mt-4 rounded-xl bg-white/10 p-3 text-sm">Indicative monthly SIP needed: <strong>{formatINR(calculation.requiredSip)}</strong></p>}{calculation.extraLabel && <p className="mt-3 text-sm text-emerald-100">{calculation.extraLabel}</p>}
-            {calculation.totalWithdrawn != null && <div className="mt-5 rounded-xl bg-white/10 p-4"><p className="text-sm font-semibold">Corpus breakup</p><div className="mt-3 flex items-center gap-4"><div className="relative h-24 w-24 shrink-0 rounded-full" style={{ background: `conic-gradient(#a7f3d0 0deg ${(calculation.totalWithdrawn / Math.max(1, calculation.totalValue)) * 360}deg, #ffffff ${(calculation.totalWithdrawn / Math.max(1, calculation.totalValue)) * 360}deg 360deg)` }}><div className="absolute inset-4 rounded-full bg-emerald-800" /></div><div className="space-y-2 text-xs"><p><span className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-emerald-200" />Total withdrawn: <strong>{formatINR(calculation.totalWithdrawn)}</strong></p><p><span className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-white" />Remaining corpus: <strong>{formatINR(calculation.result)}</strong></p></div></div></div>}
-            {calculation.note && <p className="mt-5 border-t border-white/20 pt-4 text-xs leading-5 text-emerald-50">{calculation.note}</p>}
-          </> : <div className="mt-5 rounded-xl bg-white/10 p-4"><p className="font-semibold">{calculation.market ? "Market data connection needed" : "Result will appear here"}</p><p className="mt-2 text-sm leading-6 text-emerald-100">{calculation.message}</p></div>}
-        </div>
-      </div>
-
-      {calculation.ready && schedule.length > 0 && <div className="border-t border-slate-100 p-5 sm:p-8">
-        <div className="mb-5"><p className="text-xs font-bold uppercase tracking-widest text-emerald-700">Monthly breakdown</p><h4 className="mt-1 text-xl font-bold text-slate-900">Month-by-month calculation</h4><p className="mt-1 text-sm text-slate-500">Each row shows how the balance changes over time.</p></div>
-        <div className="grid gap-5 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 p-4"><h5 className="font-bold text-slate-800">Balance growth graph</h5><div className="mt-5 flex h-44 items-end gap-1 overflow-hidden border-b border-slate-200 px-1">{chartSchedule.map((row, i) => <div key={`${row.period}-${i}`} title={`${row.period}: ${formatINR(row.closing)}`} className="min-w-1 flex-1 rounded-t-sm bg-emerald-500/80 hover:bg-emerald-700" style={{ height: `${Math.max(3, (row.closing / maxClosing) * 100)}%` }} />)}</div><div className="mt-2 flex justify-between text-xs text-slate-500"><span>{schedule[0]?.period}</span><span>{schedule[schedule.length - 1]?.period}</span></div><p className="mt-2 text-xs text-slate-500">Showing up to 12 representative points across the selected period. Scroll the table below to view every month.</p></div>
-          <div className="rounded-2xl border border-slate-200 p-4"><h5 className="font-bold text-slate-800">Breakdown summary</h5><div className="mt-4 space-y-4">{[{ label: "Opening / Principal", value: calculation.invested ?? schedule[0]?.opening ?? 0, width: 100 }, { label: "Final balance", value: calculation.result, width: Math.max(4, Math.min(100, (calculation.result / Math.max(1, calculation.invested ?? calculation.result)) * 100)) }].map((item) => <div key={item.label}><div className="mb-1 flex justify-between gap-3 text-sm"><span className="text-slate-600">{item.label}</span><strong className="text-slate-900">{formatINR(item.value)}</strong></div><div className="h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-600" style={{ width: `${item.width}%` }} /></div></div>)}</div><p className="mt-4 text-xs leading-5 text-slate-500">Chart is a visual summary of this calculator's monthly schedule, not a market forecast.</p></div>
-        </div>
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200"><div className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-4 py-3"><h5 className="font-bold text-slate-800">Detailed monthly table</h5><span className="text-xs text-slate-500">{schedule.length} month(s)</span></div><div className="max-h-[520px] overflow-auto"><table className="min-w-[720px] w-full text-left text-sm"><thead className="sticky top-0 bg-white text-xs uppercase tracking-wide text-slate-500 shadow-sm"><tr><th className="px-4 py-3">Period</th><th className="px-4 py-3 text-right">Opening</th><th className="px-4 py-3 text-right">Cash Flow</th><th className="px-4 py-3 text-right">Interest/Gain</th><th className="px-4 py-3 text-right">Closing</th></tr></thead><tbody>{schedule.map((row, index) => <tr key={`${row.period}-${index}`} className="border-t border-slate-100 even:bg-slate-50/60"><td className="whitespace-nowrap px-4 py-3 font-medium text-slate-700">{row.period}</td><td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">{formatINR(row.opening)}</td><td className={`whitespace-nowrap px-4 py-3 text-right tabular-nums ${row.cashFlow < 0 ? "text-rose-600" : row.cashFlow > 0 ? "text-emerald-700" : "text-slate-500"}`}>{row.cashFlow < 0 ? "−" : row.cashFlow > 0 ? "+" : ""}{formatINR(Math.abs(row.cashFlow))}</td><td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">{formatINR(row.interest)}</td><td className="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums text-slate-900">{formatINR(row.closing)}</td></tr>)}</tbody></table></div></div>
-      </div>}
-      {calculation.ready && schedule.length === 0 && !isMarketTool && <div className="border-t border-slate-100 px-5 py-6 text-sm text-slate-500 sm:px-8">This calculator produces a summary estimate; a monthly schedule is not applicable to this calculation.</div>}
-      <div className="border-t border-slate-100 bg-slate-50 px-5 py-4 text-xs leading-5 text-slate-500 sm:px-8">Educational estimate only—not financial, tax or investment advice. Investment returns are not guaranteed. Tax treatment, fees and actual market outcomes may differ.</div>
-    </section>
+    </div>
   );
 }
 
@@ -240,13 +261,6 @@ export default function FinancialCalculator() {
   const filteredTools = allTools.filter((tool) =>
     tool.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  const openCalculator = (tool) => {
-    setSelectedTool(tool);
-    window.setTimeout(() => {
-      document.getElementById("active-calculator")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 80);
-  };
 
   return (
     <main className="min-h-screen overflow-hidden bg-white text-slate-800">
@@ -342,7 +356,7 @@ export default function FinancialCalculator() {
 
               <div className="mt-4 grid grid-cols-2 gap-3">
                 {[
-                  { icon: TrendingUp, label: "SIP Calculator", type: "sip" },
+                  { icon: TrendingUp, label: "SIP Performance", type: "mfSip" },
                   { icon: Home, label: "EMI Calculator", type: "emi" },
                 ].map((item) => {
                   const Icon = item.icon;
@@ -350,7 +364,7 @@ export default function FinancialCalculator() {
                   return (
                     <button
                       key={item.label}
-                      onClick={() => openCalculator(tool)}
+                      onClick={() => setSelectedTool(tool)}
                       className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/10 p-3 text-left transition hover:bg-white/20"
                     >
                       <Icon size={21} className="shrink-0 text-emerald-200" />
@@ -368,7 +382,7 @@ export default function FinancialCalculator() {
       <section className="border-b border-slate-100 bg-slate-50">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-5 px-5 py-7 sm:grid-cols-4 sm:px-8 lg:px-10">
           {[
-            { icon: TrendingUp, title: "SIP Calculator", text: "Estimate SIP growth", type: "sip" },
+            { icon: TrendingUp, title: "SIP Performance", text: "Estimate MF SIP growth", type: "mfSip" },
             { icon: Landmark, title: "Retirement", text: "Plan your corpus", type: "retirement" },
             { icon: IndianRupee, title: "Tax Planning", text: "Explore tax planning", type: "tax" },
             { icon: Home, title: "EMI Calculator", text: "Calculate loan EMIs", type: "emi" },
@@ -378,7 +392,7 @@ export default function FinancialCalculator() {
             return (
               <button
                 key={item.title}
-                onClick={() => openCalculator(tool)}
+                onClick={() => setSelectedTool(tool)}
                 className="flex items-center gap-3 rounded-2xl bg-white p-4 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
                 <span className="rounded-xl bg-emerald-50 p-3 text-emerald-700">
@@ -430,7 +444,7 @@ export default function FinancialCalculator() {
             </p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredTools.map((tool) => (
-                <CalculatorCard key={`${tool.group}-${tool.name}`} tool={tool} onSelect={openCalculator} />
+                <CalculatorCard key={`${tool.group}-${tool.name}`} tool={tool} onSelect={setSelectedTool} />
               ))}
             </div>
             {filteredTools.length === 0 && (
@@ -451,19 +465,13 @@ export default function FinancialCalculator() {
               </div>
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {group.tools.map((tool) => (
-                  <CalculatorCard key={tool.name} tool={tool} onSelect={openCalculator} />
+                  <CalculatorCard key={tool.name} tool={tool} onSelect={setSelectedTool} />
                 ))}
               </div>
             </div>
           ))
         )}
       </section>
-
-      {selectedTool && (
-        <div className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:px-10">
-          <CalculatorPanel tool={selectedTool} onClose={() => setSelectedTool(null)} />
-        </div>
-      )}
 
       {/* CTA */}
       <section className="px-5 pb-16 sm:px-8 sm:pb-20 lg:px-10">
@@ -498,7 +506,12 @@ export default function FinancialCalculator() {
         before making financial decisions.
       </div>
 
-
+      {selectedTool && (
+        <CalculatorModal
+          tool={selectedTool}
+          onClose={() => setSelectedTool(null)}
+        />
+      )}
     </main>
   );
 }
