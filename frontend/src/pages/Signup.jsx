@@ -1,9 +1,12 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signup() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -12,17 +15,20 @@ export default function Signup() {
     confirmPassword: "",
     terms: false,
   });
+
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const updateField = (e) => {
     const { name, value, checked, type } = e.target;
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -41,14 +47,41 @@ export default function Signup() {
       return;
     }
 
-    // Connect your registration API here.
-    // Never store plain-text passwords in your database.
-    console.log({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      password: form.password,
-    });
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            password: form.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Registration failed. Please try again."
+        );
+      }
+
+      alert("Account created successfully! Please login.");
+
+      navigate("/login", { replace: true });
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass =
@@ -66,9 +99,11 @@ export default function Signup() {
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-3xl">
               ₹
             </div>
+
             <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
               Take control of your financial journey.
             </h1>
+
             <p className="mt-5 leading-7 text-emerald-100">
               Create your account to organise your financial goals
               and work towards a better financial future.
@@ -90,9 +125,11 @@ export default function Signup() {
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-700">
             Get started
           </p>
+
           <h2 className="mt-2 text-3xl font-bold text-slate-900">
             Create your account
           </h2>
+
           <p className="mt-3 text-sm text-slate-500">
             Fill in your details to get started with NiveshTrack.
           </p>
@@ -102,6 +139,7 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Full name
               </label>
+
               <input
                 name="name"
                 value={form.name}
@@ -118,6 +156,7 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Email address
               </label>
+
               <input
                 type="email"
                 name="email"
@@ -134,6 +173,7 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Mobile number
               </label>
+
               <input
                 type="tel"
                 name="phone"
@@ -153,6 +193,7 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Password
               </label>
+
               <div className="flex rounded-xl border border-slate-200 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -165,6 +206,7 @@ export default function Signup() {
                   placeholder="At least 8 characters"
                   className="min-w-0 flex-1 rounded-xl px-4 py-3 outline-none"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -179,6 +221,7 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Confirm password
               </label>
+
               <input
                 type={showPassword ? "text" : "password"}
                 name="confirmPassword"
@@ -205,13 +248,20 @@ export default function Signup() {
                 onChange={updateField}
                 className="mt-1 accent-emerald-700"
               />
+
               <span>
                 I agree to the{" "}
-                <Link to="/terms" className="font-semibold text-emerald-700 hover:underline">
+                <Link
+                  to="/terms"
+                  className="font-semibold text-emerald-700 hover:underline"
+                >
                   Terms and Conditions
                 </Link>{" "}
                 and{" "}
-                <Link to="/privacy-policy" className="font-semibold text-emerald-700 hover:underline">
+                <Link
+                  to="/privacy-policy"
+                  className="font-semibold text-emerald-700 hover:underline"
+                >
                   Privacy Policy
                 </Link>.
               </span>
@@ -219,9 +269,10 @@ export default function Signup() {
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-emerald-700 py-3.5 font-semibold text-white transition hover:bg-emerald-800"
+              disabled={loading}
+              className="w-full rounded-xl bg-emerald-700 py-3.5 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 

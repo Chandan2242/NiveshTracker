@@ -5,31 +5,49 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate,
+  Outlet,
 } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// Website Pages
 import Home from "./pages/Home";
 import About from "./pages/About";
 import FinancialCalculator from "./pages/FinancialCalculator";
 import RelationshipManager from "./pages/RelationshipManager";
-
 import NRIServices from "./pages/NRIServices";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-
+import ForgotPassword from "./pages/ForgotPassword";
 import ServiceDetail, { AllServices } from "./pages/ServicePages";
-
-import AdminLayout from "./admin/AdminLayout";
-import AdminLogin from "./admin/AdminLogin";
-import Dashboard from "./admin/Dashboard";
-import AdminPages from "./admin/AdminPages";
 import TrustCompliance from "./pages/TrustCompliance";
+import InvestmentRequest from "./pages/InvestmentRequest";
 
-// Scroll to Top on Every Route Change
+// Admin Components
+import AdminLayout from "./admin/AdminLayout.jsx";
+import Dashboard from "./admin/Dashboard.jsx";
+import AdminPages from "./admin/AdminPages.jsx";
+import AdminInvestments from "./admin/AdminInvestments.jsx";
+
+// Client Components
+import ClientLayout from "./client/ClientLayout";
+import ClientDashboard from "./client/ClientDashboard";
+import ClientSection from "./client/ClientSection";
+import ClientProfile from "./client/ClientProfile";
+import ClientInvestments from "./client/ClientInvestments";
+
+// Advisor Components
+import AdvisorLayout from "./advisor/AdvisorLayout";
+import AdvisorDashboard from "./advisor/AdvisorDashboard";
+import AdvisorClients from "./advisor/AdvisorClients";
+import AdvisorClientDetails from "./advisor/AdvisorClientDetails";
+import AdvisorPortfolio from "./advisor/AdvisorPortfolio";
+
+// Scroll to Top
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -44,6 +62,93 @@ function ScrollToTop() {
   return null;
 }
 
+// Get Authentication Data
+function getAuthData() {
+  const token =
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("token");
+
+  const savedUser =
+    localStorage.getItem("user") ||
+    sessionStorage.getItem("user");
+
+  let user = null;
+
+  try {
+    user = savedUser ? JSON.parse(savedUser) : null;
+  } catch {
+    user = null;
+  }
+
+  return { token, user };
+}
+
+// Admin Protection
+function AdminRoute() {
+  const { token, user } = getAuthData();
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
+// Client Protection
+function ClientRoute() {
+  const { token, user } = getAuthData();
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "client") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
+// Advisor Protection
+function AdvisorRoute() {
+  const { token, user } = getAuthData();
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "advisor") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
+// Investment Request Protection
+function InvestmentRequestRoute() {
+  const { token, user } = getAuthData();
+
+  if (!token || !user) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: "/investment-request" }}
+      />
+    );
+  }
+
+  if (user.role !== "client") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <InvestmentRequest />;
+}
+
 // Website Layout
 function WebsiteLayout() {
   return (
@@ -51,41 +156,164 @@ function WebsiteLayout() {
       <Navbar />
 
       <main className="flex-1">
-        <Routes>
-          {/* Main Pages */}
-          <Route path="/" element={<Home />} />
+        <Outlet />
+      </main>
 
-          <Route path="/about-us" element={<About />} />
+      <Footer />
+    </div>
+  );
+}
+
+// Main App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+
+      <Routes>
+        {/* Admin Panel */}
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+
+            <Route
+              path="services"
+              element={<AdminPages type="services" />}
+            />
+
+            <Route
+              path="enquiries"
+              element={<AdminPages type="enquiries" />}
+            />
+
+            <Route
+              path="users"
+              element={<AdminPages type="users" />}
+            />
+
+            <Route
+              path="investments"
+              element={<AdminInvestments />}
+            />
+          </Route>
+        </Route>
+
+        {/* Client Panel */}
+        <Route path="/client" element={<ClientRoute />}>
+          <Route element={<ClientLayout />}>
+            <Route
+              index
+              element={<Navigate to="dashboard" replace />}
+            />
+
+            <Route
+              path="dashboard"
+              element={<ClientDashboard />}
+            />
+
+            <Route
+              path="profile"
+              element={<ClientProfile />}
+            />
+
+            <Route
+              path="investments"
+              element={<ClientInvestments />}
+            />
+
+            <Route
+              path="portfolio"
+              element={<ClientSection title="My Portfolio" />}
+            />
+
+            <Route
+              path="advisor"
+              element={<ClientSection title="My Advisor" />}
+            />
+          </Route>
+        </Route>
+
+        {/* Advisor Panel */}
+        <Route path="/advisor" element={<AdvisorRoute />}>
+          <Route element={<AdvisorLayout />}>
+            <Route
+              index
+              element={<Navigate to="dashboard" replace />}
+            />
+
+            <Route
+              path="dashboard"
+              element={<AdvisorDashboard />}
+            />
+
+            <Route
+              path="clients"
+              element={<AdvisorClients />}
+            />
+
+            <Route
+              path="portfolio"
+              element={<AdvisorPortfolio />}
+            />
+
+            <Route
+              path="clients/:clientId"
+              element={<AdvisorClientDetails />}
+            />
+          </Route>
+        </Route>
+
+        {/* Main Website */}
+        <Route path="/" element={<WebsiteLayout />}>
+          <Route index element={<Home />} />
+
+          <Route path="about-us" element={<About />} />
 
           <Route
-            path="/financial-calculator"
+            path="financial-calculator"
             element={<FinancialCalculator />}
           />
 
-          {/* Relationship Manager Page */}
           <Route
-            path="/relationship-manager"
+            path="relationship-manager"
             element={<RelationshipManager />}
           />
 
-          <Route path="/contact" element={<Contact />} />
+          <Route path="contact" element={<Contact />} />
 
           {/* Authentication Pages */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Signup />} />
+          <Route path="login" element={<Login />} />
+          <Route path="signup" element={<Signup />} />
+          <Route
+            path="forgot-password"
+            element={<ForgotPassword />}
+          />
 
-          {/* Old Pages - Kept for Compatibility */}
-          <Route path="/nri-services" element={<NRIServices />} />
-          <Route path="/blog" element={<Blog />} />
+          <Route
+            path="register"
+            element={<Navigate to="/signup" replace />}
+          />
 
-          {/* All Services Listing */}
-          <Route path="/services" element={<AllServices />} />
+          {/* Client Investment Request */}
+          <Route
+            path="investment-request"
+            element={<InvestmentRequestRoute />}
+          />
 
-          {/* All Individual Service Pages */}
-          <Route path="/:slug" element={<ServiceDetail />} />
+          {/* Old Pages */}
+          <Route path="nri-services" element={<NRIServices />} />
+          <Route path="blog" element={<Blog />} />
 
+          {/* Services */}
+          <Route path="services" element={<AllServices />} />
 
-          <Route path="/trust-compliance" element={<TrustCompliance />} />
+          <Route
+            path="trust-compliance"
+            element={<TrustCompliance />}
+          />
+
+          {/* Individual Service Pages */}
+          <Route path=":slug" element={<ServiceDetail />} />
 
           {/* Unknown Routes */}
           <Route
@@ -102,57 +330,7 @@ function WebsiteLayout() {
               </div>
             }
           />
-        </Routes>
-      </main>
-
-      <Footer />
-    </div>
-  );
-}
-
-// Main App
-export default function App() {
-  return (
-    <BrowserRouter>
-      <ScrollToTop />
-
-      <Routes>
-        {/* Admin Login */}
-        <Route
-          path="/admin/login"
-          element={<AdminLogin />}
-        />
-
-        {/* Admin Panel */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-
-          <Route
-            path="services"
-            element={<AdminPages type="services" />}
-          />
-
-          <Route
-            path="blogs"
-            element={<AdminPages type="blogs" />}
-          />
-
-          <Route
-            path="enquiries"
-            element={<AdminPages type="enquiries" />}
-          />
-
-          <Route
-            path="users"
-            element={<AdminPages type="users" />}
-          />
         </Route>
-
-        {/* Main Website */}
-        <Route
-          path="/*"
-          element={<WebsiteLayout />}
-        />
       </Routes>
     </BrowserRouter>
   );

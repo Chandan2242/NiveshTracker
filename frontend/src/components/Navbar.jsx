@@ -1,6 +1,11 @@
 
-import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "../assets/NiveshTracklogo.webp";
 
@@ -22,10 +27,59 @@ const services = [
   { name: "Estate Planning", path: "/estate-planning" },
 ];
 
+// Get logged-in user from storage
+function getAuthUser() {
+  const token =
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("token");
+
+  const savedUser =
+    localStorage.getItem("user") ||
+    sessionStorage.getItem("user");
+
+  if (!token || !savedUser) return null;
+
+  try {
+    return JSON.parse(savedUser);
+  } catch {
+    return null;
+  }
+}
+
+// Dashboard path according to user role
+function getDashboardPath(user) {
+  if (!user) return null;
+
+  switch (user.role) {
+    case "admin":
+      return "/admin";
+
+    case "client":
+      return "/client/dashboard";
+
+    case "advisor":
+      return "/advisor/dashboard";
+
+    default:
+      return null;
+  }
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
+  const [user, setUser] = useState(() => getAuthUser());
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const dashboardPath = getDashboardPath(user);
+
+  // Update Navbar after login/logout and route change
+  useEffect(() => {
+    setUser(getAuthUser());
+  }, [location.pathname]);
 
   const linkClass = ({ isActive }) =>
     `whitespace-nowrap text-sm font-semibold transition-colors ${
@@ -38,6 +92,20 @@ export default function Navbar() {
     setMenuOpen(false);
     setServicesOpen(false);
     setConnectOpen(false);
+  };
+
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    setUser(null);
+    closeMenu();
+
+    navigate("/");
   };
 
   return (
@@ -134,47 +202,71 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* CONNECT DROPDOWN */}
+        {/* DESKTOP CONNECT / DASHBOARD */}
         <div
-          className="relative hidden shrink-0 lg:block"
-          onMouseEnter={() => setConnectOpen(true)}
+          className="relative hidden shrink-0 lg:flex lg:items-center lg:gap-2"
+          onMouseEnter={() => !user && setConnectOpen(true)}
           onMouseLeave={() => setConnectOpen(false)}
         >
-          <button
-            type="button"
-            onClick={() => setConnectOpen((prev) => !prev)}
-            aria-expanded={connectOpen}
-            className="flex items-center gap-1 whitespace-nowrap rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 xl:px-4"
-          >
-            Connect
-            <ChevronDown
-              size={15}
-              className={`transition-transform ${
-                connectOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {connectOpen && (
-            <div className="absolute right-0 top-full z-50 w-44 pt-3">
-              <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-xl">
+          {user ? (
+            <>
+              {dashboardPath && (
                 <Link
-                  to="/login"
-                  onClick={closeMenu}
-                  className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
+                  to={dashboardPath}
+                  className="whitespace-nowrap rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
                 >
-                  Login
+                  My Dashboard
                 </Link>
+              )}
 
-                <Link
-                  to="/register"
-                  onClick={closeMenu}
-                  className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="whitespace-nowrap rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setConnectOpen((prev) => !prev)}
+                aria-expanded={connectOpen}
+                className="flex items-center gap-1 whitespace-nowrap rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 xl:px-4"
+              >
+                Connect
+
+                <ChevronDown
+                  size={15}
+                  className={`transition-transform ${
+                    connectOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {connectOpen && (
+                <div className="absolute right-0 top-full z-50 w-44 pt-3">
+                  <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-xl">
+                    <Link
+                      to="/login"
+                      onClick={closeMenu}
+                      className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
+                    >
+                      Login
+                    </Link>
+
+                    <Link
+                      to="/signup"
+                      onClick={closeMenu}
+                      className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -187,7 +279,9 @@ export default function Navbar() {
             setConnectOpen(false);
           }}
           className="rounded-lg p-2 text-slate-800 hover:bg-slate-100 lg:hidden"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={
+            menuOpen ? "Close navigation menu" : "Open navigation menu"
+          }
           aria-expanded={menuOpen}
         >
           {menuOpen ? <X size={25} /> : <Menu size={25} />}
@@ -270,29 +364,53 @@ export default function Navbar() {
               </NavLink>
             ))}
 
-            {/* MOBILE CONNECT */}
+            {/* MOBILE DASHBOARD / CONNECT / LOGOUT */}
             <div className="mt-3 border-t border-slate-100 pt-4">
-              <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Connect with us
-              </p>
+              {user ? (
+                <div className="flex flex-col gap-3">
+                  {dashboardPath && (
+                    <Link
+                      to={dashboardPath}
+                      onClick={closeMenu}
+                      className="w-full rounded-lg bg-emerald-700 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-emerald-800"
+                    >
+                      My Dashboard
+                    </Link>
+                  )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <Link
-                  to="/login"
-                  onClick={closeMenu}
-                  className="rounded-lg border border-emerald-700 px-4 py-3 text-center text-sm font-semibold text-emerald-800 hover:bg-emerald-50"
-                >
-                  Login
-                </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Connect with us
+                  </p>
 
-                <Link
-                  to="/register"
-                  onClick={closeMenu}
-                  className="rounded-lg bg-emerald-700 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-emerald-800"
-                >
-                  Sign Up
-                </Link>
-              </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      to="/login"
+                      onClick={closeMenu}
+                      className="rounded-lg border border-emerald-700 px-4 py-3 text-center text-sm font-semibold text-emerald-800 hover:bg-emerald-50"
+                    >
+                      Login
+                    </Link>
+
+                    <Link
+                      to="/signup"
+                      onClick={closeMenu}
+                      className="rounded-lg bg-emerald-700 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-emerald-800"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

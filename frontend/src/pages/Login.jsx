@@ -1,19 +1,88 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [showPassword, setShowPassword] = useState(false);
+
   const [form, setForm] = useState({
     email: "",
     password: "",
     remember: false,
   });
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Connect your login API here
-    console.log(form);
+    setError("");
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: form.email.trim(),
+            password: form.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Invalid email or password."
+        );
+      }
+
+      // Clear previous login data
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+
+      // Remember me controls storage duration
+      const storage = form.remember
+        ? localStorage
+        : sessionStorage;
+
+      storage.setItem("token", data.token);
+      storage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect according to database role
+      if (data.user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (data.user.role === "client") {
+        const redirectTo = location.state?.from;
+
+        if (redirectTo === "/investment-request") {
+          navigate("/investment-request", { replace: true });
+        } else {
+          navigate("/client/dashboard", { replace: true });
+        }
+      } else if (data.user.role === "advisor") {
+        navigate("/advisor/dashboard", { replace: true });
+      } else {
+        throw new Error("Your account role is not recognized.");
+      }
+    } catch (err) {
+      setError(
+        err.message || "Unable to login. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,9 +97,11 @@ export default function Login() {
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-3xl">
               ₹
             </div>
+
             <h2 className="text-4xl font-bold leading-tight">
               Your financial future starts here.
             </h2>
+
             <p className="mt-5 leading-7 text-emerald-100">
               Access your financial dashboard, track your investments
               and stay connected with your financial advisor.
@@ -50,9 +121,11 @@ export default function Login() {
           <p className="mt-8 text-sm font-semibold uppercase tracking-widest text-emerald-700">
             Welcome back
           </p>
+
           <h1 className="mt-2 text-3xl font-bold text-slate-900">
             Sign in to your account
           </h1>
+
           <p className="mt-3 text-sm text-slate-500">
             Enter your details to continue to your dashboard.
           </p>
@@ -62,6 +135,7 @@ export default function Login() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Email address
               </label>
+
               <input
                 type="email"
                 autoComplete="email"
@@ -79,6 +153,7 @@ export default function Login() {
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Password
               </label>
+
               <div className="flex rounded-xl border border-slate-200 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -91,6 +166,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   className="min-w-0 flex-1 rounded-xl px-4 py-3 outline-none"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -113,6 +189,7 @@ export default function Login() {
                 />
                 Remember me
               </label>
+
               <Link
                 to="/forgot-password"
                 className="font-semibold text-emerald-700 hover:underline"
@@ -121,11 +198,18 @@ export default function Login() {
               </Link>
             </div>
 
+            {error && (
+              <p role="alert" className="text-sm font-medium text-red-600">
+                {error}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="w-full rounded-xl bg-emerald-700 py-3.5 font-semibold text-white transition hover:bg-emerald-800"
+              disabled={loading}
+              className="w-full rounded-xl bg-emerald-700 py-3.5 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 

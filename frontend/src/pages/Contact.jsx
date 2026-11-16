@@ -1,28 +1,96 @@
+
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import api from "../services/api";
 
 export default function Contact() {
+  const [searchParams] = useSearchParams();
+
+  const initialService =
+    searchParams.get("service") === "sip" ? "sip" : "";
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
+    service: initialService,
+    monthlyAmount: "",
     message: "",
   });
 
   const [status, setStatus] = useState("");
+  const [statusType, setStatusType] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+
     setStatus("");
+    setStatusType("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus(
-      "The form is ready. Connect your backend API to send your message."
-    );
+
+    if (loading) return;
+
+    setLoading(true);
+    setStatus("");
+    setStatusType("");
+
+    try {
+      const fullName =
+        `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim();
+
+      // Send every field separately to backend
+      const enquiryData = {
+        name: fullName,
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        service: formData.service,
+        monthlyAmount: formData.monthlyAmount
+          ? Number(formData.monthlyAmount)
+          : null,
+        message: formData.message.trim(),
+      };
+
+      const response = await api.post("/enquiries", enquiryData);
+
+      if (response.data.success) {
+        setStatus(
+          "Thank you! Your enquiry has been submitted successfully. Our team will contact you soon."
+        );
+        setStatusType("success");
+
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          service: initialService,
+          monthlyAmount: "",
+          message: "",
+        });
+      } else {
+        setStatus(
+          response.data.message ||
+            "Unable to submit your enquiry. Please try again."
+        );
+        setStatusType("error");
+      }
+    } catch (error) {
+      setStatus(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again later."
+      );
+      setStatusType("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,7 +105,9 @@ export default function Contact() {
 
             <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
               Let's Talk About Your{" "}
-              <span className="text-emerald-700">Financial Future.</span>
+              <span className="text-emerald-700">
+                Financial Future.
+              </span>
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
@@ -103,8 +173,8 @@ export default function Contact() {
           </h2>
 
           <p className="mt-3 leading-7 text-slate-600">
-            Have questions about your portfolio, investments, market analysis
-            or financial planning? Reach out to our team anytime.
+            Share your requirements with us. Our team will contact you
+            to understand your financial goals and the services you need.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -172,6 +242,73 @@ export default function Contact() {
 
             <div>
               <label
+                htmlFor="phone"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
+                Mobile Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                placeholder="Enter mobile number"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                pattern="[0-9]{10}"
+                title="Please enter a valid 10-digit mobile number"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="service"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
+                Service Required <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="service"
+                name="service"
+                value={formData.service}
+                onChange={handleChange}
+                required
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
+              >
+                <option value="">Select a service</option>
+                <option value="sip">Mutual Fund SIP</option>
+                <option value="mutual_fund">Mutual Funds</option>
+                <option value="pms">Portfolio Management Services</option>
+                <option value="aif">Alternative Investment Fund</option>
+                <option value="insurance">Insurance</option>
+                <option value="tax_planning">Tax Planning</option>
+                <option value="other">Other Services</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="monthlyAmount"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
+                Approximate Monthly Investment (₹)
+              </label>
+              <input
+                id="monthlyAmount"
+                name="monthlyAmount"
+                type="number"
+                min="500"
+                placeholder="Example: 5000"
+                value={formData.monthlyAmount}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
+              />
+            </div>
+
+            <div>
+              <label
                 htmlFor="message"
                 className="mb-2 block text-sm font-semibold text-slate-700"
               >
@@ -181,7 +318,7 @@ export default function Contact() {
                 id="message"
                 name="message"
                 rows={5}
-                placeholder="Tell us how we can help you..."
+                placeholder="Tell us about your financial goals and requirements..."
                 value={formData.message}
                 onChange={handleChange}
                 required
@@ -191,15 +328,21 @@ export default function Contact() {
 
             <button
               type="submit"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5 hover:bg-emerald-800 sm:w-auto sm:min-w-44"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5 hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-44"
             >
-              Submit Message <span>→</span>
+              {loading ? "Submitting..." : "Submit Enquiry"}
+              {!loading && <span>→</span>}
             </button>
 
             {status && (
               <p
                 aria-live="polite"
-                className="rounded-lg bg-emerald-50 p-3 text-sm leading-6 text-emerald-800"
+                className={`rounded-lg p-3 text-sm leading-6 ${
+                  statusType === "success"
+                    ? "bg-emerald-50 text-emerald-800"
+                    : "bg-red-50 text-red-700"
+                }`}
               >
                 {status}
               </p>
@@ -243,7 +386,10 @@ export default function Contact() {
                 <h3 className="text-lg font-bold">Contact Information</h3>
                 <p className="mt-3 text-base leading-7 text-emerald-100">
                   <span className="font-semibold text-white">Phone: </span>
-                  <a href="tel:07800450600" className="hover:text-white hover:underline">
+                  <a
+                    href="tel:07800450600"
+                    className="hover:text-white hover:underline"
+                  >
                     078004 50600
                   </a>
                 </p>
@@ -272,7 +418,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Full-width Map Below Contact Details */}
+      {/* Full-width Map */}
       <section
         id="our-location"
         className="mx-auto max-w-7xl px-5 pb-14 sm:px-8 lg:pb-20"
