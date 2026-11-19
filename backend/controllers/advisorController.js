@@ -1,7 +1,7 @@
 
 const pool = require("../config/db");
 
-// Get all clients assigned to the logged-in advisor
+// ================= GET ASSIGNED REGISTERED CLIENTS =================
 const getMyClients = async (req, res) => {
   try {
     const [clients] = await pool.execute(
@@ -24,6 +24,7 @@ const getMyClients = async (req, res) => {
       count: clients.length,
       clients
     });
+
   } catch (error) {
     console.error("GET ADVISOR CLIENTS ERROR:", error);
 
@@ -34,12 +35,13 @@ const getMyClients = async (req, res) => {
   }
 };
 
-// Get details of one assigned client
+
+// ================= GET ONE ASSIGNED CLIENT =================
 const getClientDetails = async (req, res) => {
   try {
     const clientId = Number(req.params.clientId);
 
-    if (!Number.isInteger(clientId) || clientId <= 0) {
+    if (!Number.isSafeInteger(clientId) || clientId <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid client ID."
@@ -74,6 +76,7 @@ const getClientDetails = async (req, res) => {
       success: true,
       client: clients[0]
     });
+
   } catch (error) {
     console.error("GET ADVISOR CLIENT DETAILS ERROR:", error);
 
@@ -84,26 +87,32 @@ const getClientDetails = async (req, res) => {
   }
 };
 
-// Get investments of one assigned client
+
+// ================= GET ASSIGNED CLIENT INVESTMENTS =================
 const getClientInvestments = async (req, res) => {
   try {
     const clientId = Number(req.params.clientId);
 
-    if (!Number.isInteger(clientId) || clientId <= 0) {
+    if (!Number.isSafeInteger(clientId) || clientId <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid client ID."
       });
     }
 
-    // Verify that this client belongs to the logged-in advisor
+    // Verify client belongs to logged-in Advisor
     const [clients] = await pool.execute(
-      `SELECT id, name
-       FROM users
-       WHERE id = ?
-         AND advisor_id = ?
-         AND role = 'client'
-       LIMIT 1`,
+      `SELECT
+        id,
+        name,
+        email,
+        phone,
+        status
+      FROM users
+      WHERE id = ?
+        AND advisor_id = ?
+        AND role = 'client'
+      LIMIT 1`,
       [clientId, req.user.id]
     );
 
@@ -114,7 +123,9 @@ const getClientInvestments = async (req, res) => {
       });
     }
 
-    // Fetch only this client's investments
+    const client = clients[0];
+
+    // Fetch investments using verified registered user ID
     const [investments] = await pool.execute(
       `SELECT
         id,
@@ -144,11 +155,14 @@ const getClientInvestments = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      client: clients[0],
+      client,
+      registered_account: true,
+      user_id: clientId,
       count: investments.length,
       total_invested: totalInvested,
       investments
     });
+
   } catch (error) {
     console.error("GET ADVISOR CLIENT INVESTMENTS ERROR:", error);
 
@@ -159,29 +173,32 @@ const getClientInvestments = async (req, res) => {
   }
 };
 
-// Get dashboard statistics for the logged-in advisor
+
+// ================= ADVISOR DASHBOARD STATS =================
 const getDashboardStats = async (req, res) => {
   try {
+    // Assigned registered clients
     const [[clientStats]] = await pool.execute(
       `SELECT
         COUNT(*) AS total_clients,
-        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active_clients,
-        SUM(CASE WHEN status = 'suspended' THEN 1 ELSE 0 END) AS suspended_clients
+        COALESCE(SUM(status = 'active'), 0) AS active_clients,
+        COALESCE(SUM(status = 'suspended'), 0) AS suspended_clients
       FROM users
       WHERE advisor_id = ?
         AND role = 'client'`,
       [req.user.id]
     );
 
+    // Investments of assigned registered clients only
     const [[investmentStats]] = await pool.execute(
       `SELECT
-        COUNT(investments.id) AS total_investments,
-        COALESCE(SUM(investments.invested_amount), 0) AS total_invested
-      FROM investments
-      INNER JOIN users
-        ON investments.user_id = users.id
-      WHERE users.advisor_id = ?
-        AND users.role = 'client'`,
+        COUNT(i.id) AS total_investments,
+        COALESCE(SUM(i.invested_amount), 0) AS total_invested
+      FROM users u
+      INNER JOIN investments i
+        ON i.user_id = u.id
+      WHERE u.advisor_id = ?
+        AND u.role = 'client'`,
       [req.user.id]
     );
 
@@ -195,6 +212,7 @@ const getDashboardStats = async (req, res) => {
         total_invested: Number(investmentStats.total_invested || 0)
       }
     });
+
   } catch (error) {
     console.error("GET ADVISOR DASHBOARD ERROR:", error);
 
@@ -205,6 +223,8 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+
+// ================= EXPORTS =================
 module.exports = {
   getMyClients,
   getClientDetails,

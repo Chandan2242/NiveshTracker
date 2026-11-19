@@ -1,0 +1,32 @@
+/* Hide Google Translate toolbar */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Remove Google Translate top spacing */
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* Hide Google Translate branding */
+.goog-logo-link,
+.goog-te-gadget span {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+/* Hide Google Translate widget */
+#google_translate_element {
+  display: none !important;
+}

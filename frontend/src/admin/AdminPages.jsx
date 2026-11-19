@@ -16,7 +16,6 @@ const pageData = {
   enquiries: {
     title: "Enquiries",
     description: "Review enquiries submitted by website visitors.",
-    columns: ["Name", "Email", "Message", "Actions"],
   },
   users: {
     title: "Users",
@@ -33,11 +32,11 @@ const initialServiceForm = {
 
 export default function AdminPages({ type }) {
   const [search, setSearch] = useState("");
+
   const [users, setUsers] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
   const [services, setServices] = useState([]);
 
-  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
 
   const [serviceForm, setServiceForm] = useState(initialServiceForm);
@@ -64,7 +63,7 @@ export default function AdminPages({ type }) {
     };
   };
 
-  // Fetch Users
+  // FETCH USERS
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
@@ -85,7 +84,7 @@ export default function AdminPages({ type }) {
     }
   }, []);
 
-  // Fetch Enquiries
+  // FETCH CONTACT ENQUIRIES
   const fetchEnquiries = useCallback(async () => {
     try {
       setLoading(true);
@@ -98,15 +97,18 @@ export default function AdminPages({ type }) {
 
       setEnquiries(response.data.enquiries || []);
     } catch (err) {
+      console.error("Fetch Enquiries Error:", err);
+
       setError(
-        err.response?.data?.message || "Unable to load enquiries."
+        err.response?.data?.message ||
+          "Unable to load contact enquiries."
       );
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch Services
+  // FETCH SERVICES
   const fetchServices = useCallback(async () => {
     try {
       setLoading(true);
@@ -127,7 +129,7 @@ export default function AdminPages({ type }) {
     }
   }, []);
 
-  // Load data according to page
+  // LOAD PAGE DATA
   useEffect(() => {
     setSearch("");
     setSuccess("");
@@ -144,7 +146,7 @@ export default function AdminPages({ type }) {
 
   if (!page) return <p>Page not found.</p>;
 
-  // Search Users
+  // FILTER USERS
   const filteredUsers = users.filter((user) => {
     const query = search.trim().toLowerCase();
 
@@ -156,7 +158,7 @@ export default function AdminPages({ type }) {
     );
   });
 
-  // Search Enquiries
+  // FILTER CONTACT ENQUIRIES
   const filteredEnquiries = enquiries.filter((enquiry) => {
     const query = search.trim().toLowerCase();
 
@@ -164,11 +166,13 @@ export default function AdminPages({ type }) {
       !query ||
       enquiry.name?.toLowerCase().includes(query) ||
       enquiry.email?.toLowerCase().includes(query) ||
-      enquiry.message?.toLowerCase().includes(query)
+      enquiry.phone?.toLowerCase().includes(query) ||
+      enquiry.message?.toLowerCase().includes(query) ||
+      enquiry.service?.toLowerCase().includes(query)
     );
   });
 
-  // Search Services
+  // FILTER SERVICES
   const filteredServices = services.filter((service) => {
     const query = search.trim().toLowerCase();
 
@@ -180,7 +184,7 @@ export default function AdminPages({ type }) {
     );
   });
 
-  // Open Add Service Form
+  // ADD SERVICE
   const handleAddService = () => {
     setSelectedService(null);
     setServiceForm(initialServiceForm);
@@ -189,7 +193,7 @@ export default function AdminPages({ type }) {
     setShowServiceForm(true);
   };
 
-  // Open Edit Service Form
+  // EDIT SERVICE
   const handleEditService = (service) => {
     setSelectedService(service);
 
@@ -204,7 +208,7 @@ export default function AdminPages({ type }) {
     setShowServiceForm(true);
   };
 
-  // Add / Update Service
+  // SAVE SERVICE
   const handleServiceSubmit = async (e) => {
     e.preventDefault();
 
@@ -258,7 +262,7 @@ export default function AdminPages({ type }) {
     }
   };
 
-  // Delete Service
+  // DELETE SERVICE
   const handleDeleteService = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to permanently delete this service?"
@@ -292,44 +296,6 @@ export default function AdminPages({ type }) {
     }
   };
 
-  // Delete Enquiry
-  const handleDeleteEnquiry = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to permanently delete this enquiry?"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      setDeletingId(id);
-      setError("");
-      setSuccess("");
-
-      const response = await api.delete(
-        `/enquiries/${id}`,
-        getAuthConfig()
-      );
-
-      setEnquiries((previous) =>
-        previous.filter((enquiry) => enquiry.id !== id)
-      );
-
-      if (selectedEnquiry?.id === id) {
-        setSelectedEnquiry(null);
-      }
-
-      setSuccess(
-        response.data.message || "Enquiry deleted successfully."
-      );
-    } catch (err) {
-      setError(
-        err.response?.data?.message || "Unable to delete enquiry."
-      );
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   const refreshData =
     type === "users"
       ? fetchUsers
@@ -339,6 +305,7 @@ export default function AdminPages({ type }) {
 
   return (
     <div>
+      {/* PAGE HEADING */}
       <h1 className="text-3xl font-bold text-slate-900">
         {page.title}
       </h1>
@@ -347,7 +314,10 @@ export default function AdminPages({ type }) {
         {page.description}
       </p>
 
+      {/* MAIN CONTENT */}
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
+
+        {/* TOP SEARCH AND BUTTONS */}
         <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row">
           <input
             type="search"
@@ -383,7 +353,9 @@ export default function AdminPages({ type }) {
           {type === "blogs" && (
             <button
               type="button"
-              onClick={() => alert("Blog management is not connected yet.")}
+              onClick={() =>
+                alert("Blog management is not connected yet.")
+              }
               className="rounded-lg bg-[#3D7A89] px-5 py-3 text-white"
             >
               + Add Blog
@@ -391,46 +363,39 @@ export default function AdminPages({ type }) {
           )}
         </div>
 
+        {/* SUCCESS MESSAGE */}
         {success && (
           <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {success}
           </div>
         )}
 
+        {/* ERROR MESSAGE */}
         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[500px] text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
-              <tr>
-                {page.columns.map((column) => (
-                  <th
-                    key={column}
-                    className="px-4 py-4 font-semibold"
-                  >
-                    {column}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+        {/* SERVICES TABLE */}
+        {type === "services" && (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[500px] text-left text-sm">
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  {page.columns.map((column) => (
+                    <th key={column} className="px-4 py-4 font-semibold">
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
 
-            <tbody>
-              {/* SERVICES */}
-              {type === "services" ? (
-                loading ? (
+              <tbody>
+                {loading ? (
                   <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
+                    <td colSpan={4} className="px-4 py-12 text-center text-slate-500">
                       Loading services...
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                      Unable to display services.
                     </td>
                   </tr>
                 ) : filteredServices.length > 0 ? (
@@ -450,23 +415,17 @@ export default function AdminPages({ type }) {
                       </td>
 
                       <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${
-                            service.status === "active"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
+                        <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold capitalize text-emerald-700">
                           {service.status}
                         </span>
                       </td>
 
                       <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => handleEditService(service)}
-                            className="rounded-lg bg-[#3D7A89] px-3 py-2 text-xs font-semibold text-white hover:bg-[#326675]"
+                            className="rounded-lg bg-[#3D7A89] px-3 py-2 text-xs font-semibold text-white"
                           >
                             Edit
                           </button>
@@ -475,9 +434,11 @@ export default function AdminPages({ type }) {
                             type="button"
                             onClick={() => handleDeleteService(service.id)}
                             disabled={deletingId === service.id}
-                            className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                            className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                           >
-                            {deletingId === service.id ? "Deleting..." : "Delete"}
+                            {deletingId === service.id
+                              ? "Deleting..."
+                              : "Delete"}
                           </button>
                         </div>
                       </td>
@@ -485,24 +446,39 @@ export default function AdminPages({ type }) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                      No services found. Click Add Service to create one.
+                    <td colSpan={4} className="px-4 py-12 text-center text-slate-500">
+                      No services found.
                     </td>
                   </tr>
-                )
+                )}
+              </tbody>
+            </table>
 
-              /* USERS */
-              ) : type === "users" ? (
-                loading ? (
+            <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-slate-500">
+              Showing {filteredServices.length} of {services.length} services.
+            </div>
+          </div>
+        )}
+
+        {/* USERS TABLE */}
+        {type === "users" && (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[500px] text-left text-sm">
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  {page.columns.map((column) => (
+                    <th key={column} className="px-4 py-4 font-semibold">
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody>
+                {loading ? (
                   <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
+                    <td colSpan={3} className="px-4 py-12 text-center text-slate-500">
                       Loading users...
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                      Unable to display users.
                     </td>
                   </tr>
                 ) : filteredUsers.length > 0 ? (
@@ -514,9 +490,11 @@ export default function AdminPages({ type }) {
                       <td className="px-4 py-4 font-medium text-slate-800">
                         {user.name}
                       </td>
+
                       <td className="px-4 py-4 text-slate-600">
                         {user.email}
                       </td>
+
                       <td className="px-4 py-4">
                         <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold capitalize text-emerald-700">
                           {user.role}
@@ -526,102 +504,115 @@ export default function AdminPages({ type }) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
+                    <td colSpan={3} className="px-4 py-12 text-center text-slate-500">
                       No users found.
                     </td>
                   </tr>
-                )
+                )}
+              </tbody>
+            </table>
 
-              /* ENQUIRIES */
-              ) : type === "enquiries" ? (
-                loading ? (
+            <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-slate-500">
+              Showing {filteredUsers.length} of {users.length} users.
+            </div>
+          </div>
+        )}
+
+        {/* CONTACT ENQUIRIES TABLE */}
+        {type === "enquiries" && (
+          <section>
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-slate-900">
+                Contact Enquiries
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                All enquiries submitted through the website contact form.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <table className="w-full min-w-[950px] text-left text-sm">
+                <thead className="bg-slate-50 text-slate-600">
                   <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                      Loading enquiries...
-                    </td>
+                    <th className="px-4 py-4 font-semibold">Name</th>
+                    <th className="px-4 py-4 font-semibold">Email</th>
+                    <th className="px-4 py-4 font-semibold">Phone</th>
+                    <th className="px-4 py-4 font-semibold">Service</th>
+                    <th className="px-4 py-4 font-semibold">Monthly Amount</th>
+                    <th className="px-4 py-4 font-semibold">Message</th>
+                    <th className="px-4 py-4 font-semibold">Submitted Date</th>
                   </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                      Unable to display enquiries.
-                    </td>
-                  </tr>
-                ) : filteredEnquiries.length > 0 ? (
-                  filteredEnquiries.map((enquiry) => (
-                    <tr
-                      key={enquiry.id}
-                      className="border-t border-slate-100 hover:bg-slate-50"
-                    >
-                      <td className="px-4 py-4 font-medium text-slate-800">
-                        {enquiry.name}
-                      </td>
+                </thead>
 
-                      <td className="px-4 py-4 text-slate-600">
-                        {enquiry.email}
-                      </td>
-
-                      <td className="max-w-xs px-4 py-4 text-slate-600">
-                        <p className="whitespace-pre-wrap break-words">
-                          {enquiry.message}
-                        </p>
-                      </td>
-
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedEnquiry(enquiry)}
-                            className="rounded-lg bg-[#3D7A89] px-3 py-2 text-xs font-semibold text-white hover:bg-[#326675]"
-                          >
-                            View
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteEnquiry(enquiry.id)}
-                            disabled={deletingId === enquiry.id}
-                            className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-                          >
-                            {deletingId === enquiry.id ? "Deleting..." : "Delete"}
-                          </button>
-                        </div>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-12 text-center text-slate-500">
+                        Loading contact enquiries...
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                      No enquiries found.
-                    </td>
-                  </tr>
-                )
-              ) : (
-                <tr>
-                  <td colSpan={page.columns.length} className="px-4 py-12 text-center text-slate-500">
-                    No data available yet. Connect the backend to load records.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                  ) : filteredEnquiries.length > 0 ? (
+                    filteredEnquiries.map((enquiry) => (
+                      <tr
+                        key={enquiry.id}
+                        className="border-t border-slate-100 align-top hover:bg-slate-50"
+                      >
+                        <td className="px-4 py-4 font-medium text-slate-800">
+                          {enquiry.name}
+                        </td>
 
-        {!loading && !error && type === "users" && (
-          <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-slate-500">
-            Showing {filteredUsers.length} of {users.length} users.
-          </div>
-        )}
+                        <td className="px-4 py-4 text-slate-600">
+                          {enquiry.email}
+                        </td>
 
-        {!loading && !error && type === "enquiries" && (
-          <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-slate-500">
-            Showing {filteredEnquiries.length} of {enquiries.length} enquiries.
-          </div>
-        )}
+                        <td className="px-4 py-4 text-slate-600">
+                          {enquiry.phone || "Not provided"}
+                        </td>
 
-        {!loading && !error && type === "services" && (
-          <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-slate-500">
-            Showing {filteredServices.length} of {services.length} services.
-          </div>
+                        <td className="px-4 py-4 text-slate-600">
+                          {enquiry.service || "Not specified"}
+                        </td>
+
+                        <td className="px-4 py-4 text-slate-600">
+                          {enquiry.monthly_amount !== null &&
+                          enquiry.monthly_amount !== undefined &&
+                          enquiry.monthly_amount !== ""
+                            ? `₹${Number(enquiry.monthly_amount).toLocaleString("en-IN", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`
+                            : "Not provided"}
+                        </td>
+
+                        <td className="max-w-xs px-4 py-4 text-slate-600">
+                          <p className="whitespace-pre-wrap break-words">
+                            {enquiry.message || "No message"}
+                          </p>
+                        </td>
+
+                        <td className="whitespace-nowrap px-4 py-4 text-slate-600">
+                          {enquiry.created_at
+                            ? new Date(enquiry.created_at).toLocaleString("en-IN")
+                            : "Not available"}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-12 text-center text-slate-500">
+                        No contact enquiries found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-3 text-xs text-slate-500">
+              Showing {filteredEnquiries.length} contact enquiries.
+            </div>
+          </section>
         )}
       </div>
 
@@ -647,7 +638,6 @@ export default function AdminPages({ type }) {
                 disabled={saving}
                 onClick={() => setShowServiceForm(false)}
                 className="rounded-lg px-3 py-1 text-2xl text-slate-500 hover:bg-slate-100 disabled:opacity-50"
-                aria-label="Close service form"
               >
                 ×
               </button>
@@ -738,87 +728,6 @@ export default function AdminPages({ type }) {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* VIEW ENQUIRY MODAL */}
-      {selectedEnquiry && type === "enquiries" && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setSelectedEnquiry(null)}
-        >
-          <div
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900">
-                Enquiry Details
-              </h2>
-
-              <button
-                type="button"
-                onClick={() => setSelectedEnquiry(null)}
-                className="rounded-lg px-3 py-1 text-2xl text-slate-500 hover:bg-slate-100"
-                aria-label="Close enquiry details"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs font-semibold uppercase text-slate-400">
-                  Name
-                </p>
-                <p className="mt-1 font-medium text-slate-800">
-                  {selectedEnquiry.name}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold uppercase text-slate-400">
-                  Email
-                </p>
-                <a
-                  href={`mailto:${selectedEnquiry.email}`}
-                  className="mt-1 inline-block text-[#3D7A89] hover:underline"
-                >
-                  {selectedEnquiry.email}
-                </a>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold uppercase text-slate-400">
-                  Message
-                </p>
-                <p className="mt-1 whitespace-pre-wrap break-words rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-                  {selectedEnquiry.message}
-                </p>
-              </div>
-
-              {selectedEnquiry.created_at && (
-                <div>
-                  <p className="text-xs font-semibold uppercase text-slate-400">
-                    Submitted At
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    {new Date(selectedEnquiry.created_at).toLocaleString()}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setSelectedEnquiry(null)}
-                className="rounded-lg bg-[#3D7A89] px-5 py-2.5 font-medium text-white hover:bg-[#326675]"
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
       )}

@@ -46,6 +46,11 @@ export default function Login() {
         );
       }
 
+      // Validate login response
+      if (!data.token || !data.user || !data.user.role) {
+        throw new Error("Invalid login response from server.");
+      }
+
       // Clear previous login data
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -63,19 +68,23 @@ export default function Login() {
       // Redirect according to database role
       if (data.user.role === "admin") {
         navigate("/admin", { replace: true });
+
       } else if (data.user.role === "client") {
         const redirectTo = location.state?.from;
 
         if (redirectTo === "/investment-request") {
           navigate("/investment-request", { replace: true });
         } else {
-          navigate("/client/dashboard", { replace: true });
+          navigate("/", { replace: true });
         }
+
       } else if (data.user.role === "advisor") {
         navigate("/advisor/dashboard", { replace: true });
+
       } else {
         throw new Error("Your account role is not recognized.");
       }
+
     } catch (err) {
       setError(
         err.message || "Unable to login. Please try again."
@@ -88,6 +97,8 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
       <div className="grid w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-xl md:grid-cols-2">
+
+        {/* LEFT SIDE */}
         <div className="hidden flex-col justify-between bg-emerald-950 p-10 text-white md:flex">
           <Link to="/" className="text-2xl font-bold">
             NiveshTrack<span className="text-emerald-400">.</span>
@@ -113,8 +124,13 @@ export default function Login() {
           </p>
         </div>
 
+        {/* RIGHT SIDE */}
         <div className="p-6 sm:p-10 md:p-12">
-          <Link to="/" className="text-xl font-bold text-emerald-800 md:hidden">
+
+          <Link
+            to="/"
+            className="text-xl font-bold text-emerald-800 md:hidden"
+          >
             NiveshTrack.
           </Link>
 
@@ -131,6 +147,8 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+
+            {/* EMAIL */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Email address
@@ -149,12 +167,14 @@ export default function Login() {
               />
             </div>
 
+            {/* PASSWORD */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">
                 Password
               </label>
 
               <div className="flex rounded-xl border border-slate-200 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+
                 <input
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
@@ -174,10 +194,13 @@ export default function Login() {
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
+
               </div>
             </div>
 
+            {/* REMEMBER ME */}
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+
               <label className="flex items-center gap-2 text-slate-600">
                 <input
                   type="checkbox"
@@ -196,14 +219,20 @@ export default function Login() {
               >
                 Forgot password?
               </Link>
+
             </div>
 
+            {/* ERROR */}
             {error && (
-              <p role="alert" className="text-sm font-medium text-red-600">
+              <p
+                role="alert"
+                className="text-sm font-medium text-red-600"
+              >
                 {error}
               </p>
             )}
 
+            {/* SUBMIT */}
             <button
               type="submit"
               disabled={loading}
@@ -211,6 +240,7 @@ export default function Login() {
             >
               {loading ? "Signing In..." : "Sign In"}
             </button>
+
           </form>
 
           <p className="mt-7 text-center text-sm text-slate-600">
@@ -226,6 +256,7 @@ export default function Login() {
           <p className="mt-8 text-center text-xs leading-5 text-slate-400">
             Protect your account. Never share your password or OTP with anyone.
           </p>
+
         </div>
       </div>
     </div>

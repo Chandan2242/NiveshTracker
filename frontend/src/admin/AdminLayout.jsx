@@ -13,6 +13,7 @@ const links = [
   { name: "Services", path: "/admin/services", icon: "◇" },
   { name: "Enquiries", path: "/admin/enquiries", icon: "✉" },
   { name: "Users", path: "/admin/users", icon: "♙" },
+  { name: "Select Advisor", path: "/admin/select-advisor", icon: "♧" },
   { name: "Manage Investments", path: "/admin/investments", icon: "₹" },
 ];
 
@@ -71,7 +72,6 @@ export default function AdminLayout() {
 
       {/* Mobile Header */}
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-5 md:hidden">
-
         <button
           type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -110,10 +110,9 @@ export default function AdminLayout() {
 
           {/* Sidebar Branding */}
           <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">
-
             <Link to="/" className="flex flex-col">
               <span className="text-2xl font-bold text-white">
-                NiveshTrack<span className="text-[#3D7A89]">.</span>
+                NiveshTrack<span className="text-[#3D7A89">.</span>
               </span>
               <span className="text-xs font-semibold tracking-widest text-slate-400">
                 ADMIN PANEL
@@ -131,7 +130,6 @@ export default function AdminLayout() {
           </div>
 
           <div className="px-4 py-6">
-
             <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
               Workspace
             </p>
@@ -223,7 +221,6 @@ export default function AdminLayout() {
 
           {/* Desktop Top Bar */}
           <header className="hidden h-20 items-center justify-between border-b border-slate-200 bg-white px-8 md:flex">
-
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Admin Panel / {currentPage}
@@ -236,7 +233,6 @@ export default function AdminLayout() {
 
             {/* Admin Details */}
             <div className="flex items-center gap-4">
-
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#007A55]/10 font-bold uppercase text-[#007A55]">
                   {adminInitial}

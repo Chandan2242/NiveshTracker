@@ -10,22 +10,18 @@ const {
   deleteEnquiry
 } = require("../controllers/enquiryController");
 
-const { protect } = require("../middlewares/authMiddleware");
-const { adminOnly } = require("../middlewares/adminMiddleware");
+const {
+  protect,
+  adminOnly
+} = require("../middlewares/authMiddleware");
 
-// Public: Submit enquiry
+// Public enquiry submission
 router.post("/", submitEnquiry);
 
-// Admin: Get all enquiries
+// Admin-only enquiry management
 router.get("/", protect, adminOnly, getAllEnquiries);
-
-// Admin: Assign enquiry to advisor
 router.put("/:id/assign", protect, adminOnly, assignEnquiry);
-
-// Admin: Update enquiry status
 router.put("/:id/status", protect, adminOnly, updateEnquiryStatus);
-
-// Admin: Delete enquiry
 router.delete("/:id", protect, adminOnly, deleteEnquiry);
 
 module.exports = router;

@@ -1,14 +1,13 @@
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   UserRound,
   Calculator,
   ClipboardCheck,
-  Phone,
   ArrowUpRight,
   Clock,
   ShieldCheck,
+  Phone,
 } from "lucide-react";
 
 // Left Teal + Right Emerald Gradient Pattern
@@ -33,37 +32,10 @@ const SectionBackground = ({ reverse = false }) => (
 );
 
 export default function RelationshipManager() {
-  const [formData, setFormData] = useState({
-    name: "",
-    mobile: "",
-    preferredTime: "",
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const message = `Hello, I would like a callback.
-
-Name: ${formData.name}
-Mobile: ${formData.mobile}
-Preferred Time: ${formData.preferredTime}`;
-
-    window.location.href = `mailto:info@niveshtrack.com?subject=Callback Request&body=${encodeURIComponent(
-      message
-    )}`;
-  };
-
   return (
     <main className="overflow-hidden bg-[#f3faf6]">
 
-      {/* HERO SECTION - Right Top Emerald + Left Bottom Teal */}
+      {/* HERO SECTION */}
       <section className="relative isolate overflow-hidden px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
         <SectionBackground />
 
@@ -76,7 +48,9 @@ Preferred Time: ${formData.preferredTime}`;
 
             <h1 className="max-w-2xl text-4xl font-bold leading-tight text-slate-900 sm:text-5xl lg:text-6xl">
               Your Financial Journey,
-              <span className="text-[#007A55]"> Guided Personally.</span>
+              <span className="text-[#007A55]">
+                {" "}Guided Personally.
+              </span>
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
@@ -86,13 +60,13 @@ Preferred Time: ${formData.preferredTime}`;
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href="#callback"
+              <Link
+                to="/contact"
                 className="inline-flex items-center gap-2 rounded-xl bg-[#007A55] px-6 py-3.5 font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-emerald-800"
               >
                 Request a Callback
                 <ArrowUpRight size={18} />
-              </a>
+              </Link>
 
               <Link
                 to="/financial-calculator"
@@ -126,7 +100,10 @@ Preferred Time: ${formData.preferredTime}`;
                   "Regular portfolio discussions",
                 ].map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <ShieldCheck className="shrink-0 text-[#007A55]" size={20} />
+                    <ShieldCheck
+                      className="shrink-0 text-[#007A55]"
+                      size={20}
+                    />
                     <span className="text-sm font-medium text-slate-700">
                       {item}
                     </span>
@@ -138,7 +115,7 @@ Preferred Time: ${formData.preferredTime}`;
         </div>
       </section>
 
-      {/* GUIDANCE SECTION - Left Top Teal + Right Bottom Emerald */}
+      {/* GUIDANCE SECTION */}
       <section className="relative isolate overflow-hidden px-5 py-16 sm:px-8 lg:px-10">
         <SectionBackground reverse />
 
@@ -204,7 +181,7 @@ Preferred Time: ${formData.preferredTime}`;
         </div>
       </section>
 
-      {/* QUICK LINKS SECTION - Right Top Emerald + Left Bottom Teal */}
+      {/* QUICK LINKS SECTION */}
       <section className="relative isolate overflow-hidden px-5 py-16 sm:px-8 lg:px-10">
         <SectionBackground />
 
@@ -271,125 +248,32 @@ Preferred Time: ${formData.preferredTime}`;
         </div>
       </section>
 
-      {/* CALLBACK SECTION - Left Top Teal + Right Bottom Emerald */}
-      <section
-        id="callback"
-        className="relative isolate overflow-hidden px-5 py-16 sm:px-8 lg:px-10"
-      >
+      {/* CONTACT CTA - NO SEPARATE FORM */}
+      <section className="relative isolate overflow-hidden px-5 py-16 sm:px-8 lg:px-10">
         <SectionBackground reverse />
 
-        <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
-          <div>
-            <span className="text-sm font-bold uppercase tracking-wider text-[#007A55]">
-              Get in Touch
-            </span>
-
-            <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">
-              Request a Callback
-            </h2>
-
-            <p className="mt-5 max-w-xl leading-8 text-slate-600">
-              Have questions about your investment journey? Share your details
-              and request a callback from our team.
-            </p>
-
-            <div className="mt-8 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#007A55] shadow-sm">
-                <Phone size={22} />
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-slate-900">
-                  Personal Assistance
-                </h3>
-                <p className="mt-1 text-sm text-slate-600">
-                  Connect with our team for assistance.
-                </p>
-              </div>
-            </div>
+        <div className="relative mx-auto max-w-5xl rounded-3xl border border-white/80 bg-white/80 p-8 text-center shadow-xl shadow-emerald-900/5 backdrop-blur-sm sm:p-12">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-[#007A55]">
+            <Phone size={28} />
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="rounded-3xl border border-white/80 bg-white/80 p-6 shadow-xl shadow-emerald-900/5 backdrop-blur-sm sm:p-8"
+          <h2 className="mt-6 text-3xl font-bold text-slate-900 sm:text-4xl">
+            Need Personal Investment Assistance?
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-2xl leading-8 text-slate-600">
+            Share your financial requirements with our team through our
+            Contact page. Our team will connect with you to understand your
+            goals and provide the necessary assistance.
+          </p>
+
+          <Link
+            to="/contact"
+            className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[#007A55] px-7 py-4 font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-emerald-800"
           >
-            <h3 className="text-2xl font-bold text-slate-900">
-              Let Us Connect With You
-            </h3>
-
-            <p className="mt-2 text-sm text-slate-600">
-              Fill in your details below.
-            </p>
-
-            <div className="mt-6 space-y-5">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Full Name
-                </label>
-
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your full name"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#007A55] focus:ring-2 focus:ring-emerald-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Mobile Number
-                </label>
-
-                <input
-                  type="tel"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  required
-                  pattern="[0-9]{10}"
-                  maxLength="10"
-                  placeholder="Enter 10-digit mobile number"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#007A55] focus:ring-2 focus:ring-emerald-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Preferred Time
-                </label>
-
-                <select
-                  name="preferredTime"
-                  value={formData.preferredTime}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-700 outline-none transition focus:border-[#007A55] focus:ring-2 focus:ring-emerald-100"
-                >
-                  <option value="">Select preferred time</option>
-                  <option value="Morning (9 AM - 12 PM)">
-                    Morning (9 AM - 12 PM)
-                  </option>
-                  <option value="Afternoon (12 PM - 4 PM)">
-                    Afternoon (12 PM - 4 PM)
-                  </option>
-                  <option value="Evening (4 PM - 7 PM)">
-                    Evening (4 PM - 7 PM)
-                  </option>
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#007A55] px-6 py-3.5 font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-emerald-800"
-              >
-                Request Callback
-                <ArrowUpRight size={18} />
-              </button>
-            </div>
-          </form>
+            Contact Our Team
+            <ArrowUpRight size={18} />
+          </Link>
         </div>
       </section>
     </main>

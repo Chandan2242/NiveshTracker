@@ -11,8 +11,9 @@ const submitEnquiry = async (req, res) => {
       service,
       monthlyAmount,
       message
-    } = req.body;
+    } = req.body || {};
 
+    // Required fields validation
     if (!name || !email || !message) {
       return res.status(400).json({
         success: false,
@@ -22,25 +23,19 @@ const submitEnquiry = async (req, res) => {
 
     const cleanName = String(name).trim();
     const cleanEmail = String(email).trim().toLowerCase();
+    const cleanMessage = String(message).trim();
     const cleanPhone = phone ? String(phone).trim() : null;
     const cleanService = service ? String(service).trim() : null;
-    const cleanMessage = String(message).trim();
 
-    const cleanMonthlyAmount =
-      monthlyAmount !== undefined &&
-      monthlyAmount !== null &&
-      monthlyAmount !== ""
-        ? Number(monthlyAmount)
-        : null;
-
-    if (!cleanName || !cleanEmail || !cleanMessage) {
+    // Validate name
+    if (cleanName.length < 2 || cleanName.length > 100) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be filled."
+        message: "Name must be between 2 and 100 characters."
       });
     }
 
-    // Email validation
+    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(cleanEmail)) {
@@ -50,32 +45,47 @@ const submitEnquiry = async (req, res) => {
       });
     }
 
-    // Phone validation
-    if (
-      cleanPhone &&
-      !/^[0-9+\-\s()]{10,20}$/.test(cleanPhone)
-    ) {
+    // Validate phone if provided
+    if (cleanPhone && !/^[0-9+\-\s()]{10,20}$/.test(cleanPhone)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid phone number."
       });
     }
 
-    // Monthly amount validation
-    if (
-      cleanMonthlyAmount !== null &&
-      (!Number.isFinite(cleanMonthlyAmount) ||
-        cleanMonthlyAmount <= 0)
-    ) {
+    // Validate message
+    if (cleanMessage.length < 5 || cleanMessage.length > 2000) {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid monthly investment amount."
+        message: "Message must be between 5 and 2000 characters."
       });
     }
 
-    await pool.execute(
+    // Validate monthly amount
+    let cleanMonthlyAmount = null;
+
+    if (
+      monthlyAmount !== undefined &&
+      monthlyAmount !== null &&
+      monthlyAmount !== ""
+    ) {
+      cleanMonthlyAmount = Number(monthlyAmount);
+
+      if (
+        !Number.isFinite(cleanMonthlyAmount) ||
+        cleanMonthlyAmount < 0
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid monthly amount."
+        });
+      }
+    }
+
+    // Insert enquiry
+    const [result] = await pool.execute(
       `INSERT INTO enquiries
-        (name, email, phone, service, monthly_amount, message, status)
+       (name, email, phone, service, monthly_amount, message, status)
        VALUES (?, ?, ?, ?, ?, ?, 'new')`,
       [
         cleanName,
@@ -89,7 +99,8 @@ const submitEnquiry = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Enquiry submitted successfully."
+      message: "Your enquiry has been submitted successfully. Our advisor will contact you soon.",
+      enquiryId: result.insertId
     });
 
   } catch (error) {
@@ -97,7 +108,7 @@ const submitEnquiry = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Unable to submit enquiry."
+      message: "Unable to submit enquiry. Please try again later."
     });
   }
 };
@@ -120,11 +131,14 @@ const getAllEnquiries = async (req, res) => {
         e.assigned_at,
         e.created_at,
         e.updated_at,
-        advisor.name AS advisor_name
-       FROM enquiries e
-       LEFT JOIN users advisor
-         ON e.assigned_advisor_id = advisor.id
-       ORDER BY e.created_at DESC`
+        advisor.name AS advisor_name,
+        assigner.name AS assigned_by_name
+      FROM enquiries e
+      LEFT JOIN users advisor
+        ON e.assigned_advisor_id = advisor.id
+      LEFT JOIN users assigner
+        ON e.assigned_by = assigner.id
+      ORDER BY e.created_at DESC`
     );
 
     return res.status(200).json({
@@ -143,11 +157,11 @@ const getAllEnquiries = async (req, res) => {
   }
 };
 
-// ================= ASSIGN ENQUIRY TO ADVISOR =================
+// ================= ASSIGN / REASSIGN ENQUIRY (ADMIN) =================
 const assignEnquiry = async (req, res) => {
   try {
     const enquiryId = Number(req.params.id);
-    const advisorId = Number(req.body.advisorId);
+    const advisorId = Number(req.body?.advisorId);
 
     if (!Number.isInteger(enquiryId) || enquiryId <= 0) {
       return res.status(400).json({
@@ -159,12 +173,16 @@ const assignEnquiry = async (req, res) => {
     if (!Number.isInteger(advisorId) || advisorId <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Valid advisor ID is required."
+        message: "Please select a valid advisor."
       });
     }
 
+    // Check enquiry exists
     const [enquiries] = await pool.execute(
-      "SELECT id FROM enquiries WHERE id = ?",
+      `SELECT id, assigned_advisor_id
+       FROM enquiries
+       WHERE id = ?
+       LIMIT 1`,
       [enquiryId]
     );
 
@@ -175,11 +193,13 @@ const assignEnquiry = async (req, res) => {
       });
     }
 
+    // Check advisor exists, is active and has advisor role
     const [advisors] = await pool.execute(
-      `SELECT id FROM users
+      `SELECT id, name, email
+       FROM users
        WHERE id = ?
-       AND role = 'advisor'
-       AND status = 'active'
+         AND role = 'advisor'
+         AND status = 'active'
        LIMIT 1`,
       [advisorId]
     );
@@ -187,15 +207,17 @@ const assignEnquiry = async (req, res) => {
     if (advisors.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Active advisor not found."
+        message: "Selected advisor not found or is inactive."
       });
     }
 
+    // Assign or reassign enquiry
     await pool.execute(
       `UPDATE enquiries
        SET assigned_advisor_id = ?,
            assigned_by = ?,
            assigned_at = NOW(),
+           status = 'assigned',
            updated_at = NOW()
        WHERE id = ?`,
       [advisorId, req.user.id, enquiryId]
@@ -203,7 +225,9 @@ const assignEnquiry = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Enquiry assigned to advisor successfully."
+      message: "Enquiry assigned successfully.",
+      enquiryId,
+      advisor: advisors[0]
     });
 
   } catch (error) {
@@ -216,18 +240,17 @@ const assignEnquiry = async (req, res) => {
   }
 };
 
-// ================= UPDATE ENQUIRY STATUS =================
+// ================= UPDATE ENQUIRY STATUS (ADMIN) =================
 const updateEnquiryStatus = async (req, res) => {
   try {
     const enquiryId = Number(req.params.id);
-    const { status } = req.body;
+    const { status } = req.body || {};
 
     const allowedStatuses = [
       "new",
-      "contacted",
+      "assigned",
       "in_progress",
-      "converted",
-      "closed"
+      "resolved"
     ];
 
     if (!Number.isInteger(enquiryId) || enquiryId <= 0) {
@@ -240,27 +263,36 @@ const updateEnquiryStatus = async (req, res) => {
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid enquiry status."
+        message: "Invalid status. Allowed: new, assigned, in_progress, resolved."
       });
     }
 
     const [result] = await pool.execute(
       `UPDATE enquiries
-       SET status = ?, updated_at = NOW()
+       SET status = ?,
+           updated_at = NOW()
        WHERE id = ?`,
       [status, enquiryId]
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Enquiry not found."
-      });
+      const [existing] = await pool.execute(
+        `SELECT id FROM enquiries WHERE id = ? LIMIT 1`,
+        [enquiryId]
+      );
+
+      if (existing.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Enquiry not found."
+        });
+      }
     }
 
     return res.status(200).json({
       success: true,
-      message: "Enquiry status updated successfully."
+      message: "Enquiry status updated successfully.",
+      status
     });
 
   } catch (error) {
@@ -276,9 +308,9 @@ const updateEnquiryStatus = async (req, res) => {
 // ================= DELETE ENQUIRY (ADMIN) =================
 const deleteEnquiry = async (req, res) => {
   try {
-    const id = Number(req.params.id);
+    const enquiryId = Number(req.params.id);
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!Number.isInteger(enquiryId) || enquiryId <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid enquiry ID."
@@ -286,8 +318,8 @@ const deleteEnquiry = async (req, res) => {
     }
 
     const [result] = await pool.execute(
-      "DELETE FROM enquiries WHERE id = ?",
-      [id]
+      `DELETE FROM enquiries WHERE id = ?`,
+      [enquiryId]
     );
 
     if (result.affectedRows === 0) {
@@ -312,6 +344,7 @@ const deleteEnquiry = async (req, res) => {
   }
 };
 
+// ================= EXPORTS =================
 module.exports = {
   submitEnquiry,
   getAllEnquiries,

@@ -66,6 +66,7 @@ const register = async (req, res) => {
   }
 };
 
+
 // ================= LOGIN =================
 const login = async (req, res) => {
   try {
@@ -141,6 +142,7 @@ const login = async (req, res) => {
   }
 };
 
+
 // ================= GET ME =================
 const getMe = async (req, res) => {
   try {
@@ -181,6 +183,7 @@ const getMe = async (req, res) => {
   }
 };
 
+
 // ================= ADD NEW MOBILE NUMBER =================
 const addMobileNumber = async (req, res) => {
   let connection;
@@ -202,7 +205,6 @@ const addMobileNumber = async (req, res) => {
     await connection.beginTransaction();
     transactionStarted = true;
 
-    // Get current user's mobile number
     const [users] = await connection.execute(
       `SELECT id, phone
        FROM users
@@ -233,7 +235,6 @@ const addMobileNumber = async (req, res) => {
       });
     }
 
-    // Check whether the new number belongs to another user
     const [existingUsers] = await connection.execute(
       `SELECT id
        FROM users
@@ -252,7 +253,6 @@ const addMobileNumber = async (req, res) => {
       });
     }
 
-    // Save previous mobile number in history
     if (oldPhone) {
       await connection.execute(
         `INSERT INTO user_phone_history (user_id, phone)
@@ -261,13 +261,11 @@ const addMobileNumber = async (req, res) => {
       );
     }
 
-    // Update latest mobile number
     await connection.execute(
       "UPDATE users SET phone = ? WHERE id = ?",
       [phone, userId]
     );
 
-    // Fetch updated user
     const [updatedUsers] = await connection.execute(
       `SELECT id, name, email, phone, role, status, created_at
        FROM users
@@ -275,7 +273,6 @@ const addMobileNumber = async (req, res) => {
       [userId]
     );
 
-    // Fetch previous mobile numbers
     const [phoneHistory] = await connection.execute(
       `SELECT phone, created_at
        FROM user_phone_history
@@ -319,6 +316,7 @@ const addMobileNumber = async (req, res) => {
     }
   }
 };
+
 
 // ================= CHANGE PASSWORD =================
 const changePassword = async (req, res) => {
@@ -402,6 +400,7 @@ const changePassword = async (req, res) => {
   }
 };
 
+
 // ================= FORGOT PASSWORD =================
 const forgotPassword = async (req, res) => {
   try {
@@ -462,6 +461,7 @@ const forgotPassword = async (req, res) => {
     });
   }
 };
+
 
 // ================= VERIFY RESET OTP =================
 const verifyResetOtp = async (req, res) => {
@@ -567,6 +567,7 @@ const verifyResetOtp = async (req, res) => {
   }
 };
 
+
 // ================= RESET PASSWORD =================
 const resetPassword = async (req, res) => {
   try {
@@ -649,7 +650,309 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// ================= CREATE ADVISOR (ADMIN ONLY) =================
+
+// ================= GET ALL ADVISORS =================
+const getAdvisors = async (req, res) => {
+  try {
+    const [advisors] = await pool.execute(
+      `SELECT
+         a.id,
+         a.name,
+         a.email,
+         a.phone,
+         a.status,
+         a.created_at,
+         COUNT(c.id) AS assigned_clients
+       FROM users a
+       LEFT JOIN users c
+         ON c.advisor_id = a.id
+         AND c.role = 'client'
+       WHERE a.role = 'advisor'
+       GROUP BY
+         a.id,
+         a.name,
+         a.email,
+         a.phone,
+         a.status,
+         a.created_at
+       ORDER BY a.created_at DESC`
+    );
+
+    return res.status(200).json({
+      success: true,
+      count: advisors.length,
+      advisors
+    });
+
+  } catch (error) {
+    console.error("GET ADVISORS ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch advisors."
+    });
+  }
+};
+
+
+// ================= SEARCH REGISTERED CLIENTS =================
+const getAdvisorCandidates = async (req, res) => {
+  try {
+    const email = String(req.query.email || "")
+      .trim()
+      .toLowerCase();
+
+    if (!email || email.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Enter at least 3 characters of the email address."
+      });
+    }
+
+    const [users] = await pool.execute(
+      `SELECT id, name, email, phone, role, status
+       FROM users
+       WHERE role = 'client'
+         AND status = 'active'
+         AND email LIKE ?
+       ORDER BY name ASC
+       LIMIT 20`,
+      [`%${email}%`]
+    );
+
+    return res.status(200).json({
+      success: true,
+      count: users.length,
+      users
+    });
+
+  } catch (error) {
+    console.error("SEARCH ADVISOR CANDIDATES ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to search registered users."
+    });
+  }
+};
+
+
+// ================= PROMOTE CLIENT TO ADVISOR =================
+const promoteUserToAdvisor = async (req, res) => {
+  let connection;
+  let transactionStarted = false;
+
+  try {
+    const userId = Number(req.params.id);
+
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID."
+      });
+    }
+
+    connection = await pool.getConnection();
+
+    await connection.beginTransaction();
+    transactionStarted = true;
+
+    const [users] = await connection.execute(
+      `SELECT id, name, email, role, status
+       FROM users
+       WHERE id = ?
+       FOR UPDATE`,
+      [userId]
+    );
+
+    if (users.length === 0) {
+      await connection.rollback();
+      transactionStarted = false;
+
+      return res.status(404).json({
+        success: false,
+        message: "Registered user not found."
+      });
+    }
+
+    const user = users[0];
+
+    if (user.role !== "client") {
+      await connection.rollback();
+      transactionStarted = false;
+
+      return res.status(409).json({
+        success: false,
+        message: "Only registered clients can be promoted to Advisor."
+      });
+    }
+
+    if (user.status !== "active") {
+      await connection.rollback();
+      transactionStarted = false;
+
+      return res.status(403).json({
+        success: false,
+        message: "Suspended users cannot become Advisors."
+      });
+    }
+
+    await connection.execute(
+      `UPDATE users
+       SET role = 'advisor',
+           advisor_id = NULL
+       WHERE id = ?`,
+      [userId]
+    );
+
+    await connection.commit();
+    transactionStarted = false;
+
+    return res.status(200).json({
+      success: true,
+      message: `${user.name} has been promoted to Advisor successfully.`,
+      advisor: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: "advisor"
+      }
+    });
+
+  } catch (error) {
+    if (connection && transactionStarted) {
+      await connection.rollback();
+    }
+
+    console.error("PROMOTE ADVISOR ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to promote user to Advisor."
+    });
+
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+};
+
+
+// ================= REMOVE ADVISOR PRIVILEGE =================
+const removeAdvisor = async (req, res) => {
+  let connection;
+  let transactionStarted = false;
+
+  try {
+    const advisorId = Number(req.params.id);
+
+    if (!Number.isSafeInteger(advisorId) || advisorId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Advisor ID."
+      });
+    }
+
+    connection = await pool.getConnection();
+
+    await connection.beginTransaction();
+    transactionStarted = true;
+
+    const [advisors] = await connection.execute(
+      `SELECT id, name, email, role
+       FROM users
+       WHERE id = ?
+       FOR UPDATE`,
+      [advisorId]
+    );
+
+    if (advisors.length === 0) {
+      await connection.rollback();
+      transactionStarted = false;
+
+      return res.status(404).json({
+        success: false,
+        message: "Advisor not found."
+      });
+    }
+
+    const advisor = advisors[0];
+
+    if (advisor.role !== "advisor") {
+      await connection.rollback();
+      transactionStarted = false;
+
+      return res.status(409).json({
+        success: false,
+        message: "This user is not an Advisor."
+      });
+    }
+
+    const [clients] = await connection.execute(
+      `SELECT COUNT(*) AS total
+       FROM users
+       WHERE advisor_id = ?
+         AND role = 'client'`,
+      [advisorId]
+    );
+
+    const assignedClients = Number(clients[0].total);
+
+    if (assignedClients > 0) {
+      await connection.rollback();
+      transactionStarted = false;
+
+      return res.status(409).json({
+        success: false,
+        message: `This Advisor has ${assignedClients} assigned client(s). Reassign or unassign those clients before removing Advisor privileges.`,
+        assigned_clients: assignedClients
+      });
+    }
+
+    await connection.execute(
+      `UPDATE users
+       SET role = 'client',
+           advisor_id = NULL
+       WHERE id = ?`,
+      [advisorId]
+    );
+
+    await connection.commit();
+    transactionStarted = false;
+
+    return res.status(200).json({
+      success: true,
+      message: `${advisor.name} is now a Client. Their account and login credentials have not been deleted.`,
+      user: {
+        id: advisor.id,
+        name: advisor.name,
+        email: advisor.email,
+        role: "client"
+      }
+    });
+
+  } catch (error) {
+    if (connection && transactionStarted) {
+      await connection.rollback();
+    }
+
+    console.error("REMOVE ADVISOR ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to remove Advisor privileges."
+    });
+
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+};
+
+
+// ================= CREATE ADVISOR (LEGACY) =================
 const createAdvisor = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body || {};
@@ -717,14 +1020,7 @@ const createAdvisor = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Advisor account created successfully.",
-      advisor: {
-        id: result.insertId,
-        name: cleanName,
-        email: cleanEmail,
-        phone: cleanPhone,
-        role: "advisor",
-        status: "active"
-      }
+      userId: result.insertId
     });
 
   } catch (error) {
@@ -737,11 +1033,12 @@ const createAdvisor = async (req, res) => {
   }
 };
 
+
 // ================= GET ALL USERS (ADMIN ONLY) =================
 const getAllUsers = async (req, res) => {
   try {
     const [users] = await pool.execute(
-      `SELECT id, name, email, role, status, created_at
+      `SELECT id, name, email, phone, role, status, created_at
        FROM users
        ORDER BY created_at DESC`
     );
@@ -762,6 +1059,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+
 // ================= EXPORTS =================
 module.exports = {
   register,
@@ -772,6 +1070,14 @@ module.exports = {
   forgotPassword,
   verifyResetOtp,
   resetPassword,
+
+  // Advisor Management
+  getAdvisors,
+  getAdvisorCandidates,
+  promoteUserToAdvisor,
+  removeAdvisor,
+
+  // Existing functions
   createAdvisor,
   getAllUsers
 };

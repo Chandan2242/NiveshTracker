@@ -1,7 +1,9 @@
 
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import api from "../services/api";
+
+// Paste your deployed Google Apps Script URL here
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuvkwwUBKdKrCxeOKmGD7mzWnIFuZU3z2gq-ITjLr78CpCV2FitMKPpJJFX7kLoPjZ/exec";
 
 export default function Contact() {
   const [searchParams] = useSearchParams();
@@ -38,56 +40,66 @@ export default function Contact() {
 
     if (loading) return;
 
+    if (
+      GOOGLE_SCRIPT_URL === "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE"
+    ) {
+      setStatus("Google Script URL is not configured.");
+      setStatusType("error");
+      return;
+    }
+
     setLoading(true);
     setStatus("");
     setStatusType("");
 
     try {
-      const fullName =
-        `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim();
+      const payload = new URLSearchParams();
 
-      // Send every field separately to backend
-      const enquiryData = {
-        name: fullName,
-        email: formData.email.trim().toLowerCase(),
-        phone: formData.phone.trim(),
-        service: formData.service,
-        monthlyAmount: formData.monthlyAmount
-          ? Number(formData.monthlyAmount)
-          : null,
-        message: formData.message.trim(),
-      };
-
-      const response = await api.post("/enquiries", enquiryData);
-
-      if (response.data.success) {
-        setStatus(
-          "Thank you! Your enquiry has been submitted successfully. Our team will contact you soon."
-        );
-        setStatusType("success");
-
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          service: initialService,
-          monthlyAmount: "",
-          message: "",
-        });
-      } else {
-        setStatus(
-          response.data.message ||
-            "Unable to submit your enquiry. Please try again."
-        );
-        setStatusType("error");
-      }
-    } catch (error) {
-      setStatus(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again later."
+      payload.append("firstName", formData.firstName.trim());
+      payload.append("lastName", formData.lastName.trim());
+      payload.append("email", formData.email.trim().toLowerCase());
+      payload.append("phone", formData.phone.trim());
+      payload.append("service", formData.service);
+      payload.append(
+        "monthlyAmount",
+        formData.monthlyAmount || ""
       );
+      payload.append("message", formData.message.trim());
+
+      // Send directly to Google Apps Script.
+      // no-cors is used because Apps Script does not provide
+      // normal browser CORS access to its response.
+
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: payload,
+      });
+
+      setStatus(
+        "Your enquiry has been submitted. Please note that email delivery cannot be verified by the browser."
+      );
+      setStatusType("success");
+
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        service: initialService,
+        monthlyAmount: "",
+        message: "",
+      });
+
+    } catch (error) {
+      console.error("Contact form error:", error);
+
+      setStatus(
+        "Unable to submit your enquiry. Please try again."
+      );
+
       setStatusType("error");
+
     } finally {
       setLoading(false);
     }
@@ -95,9 +107,11 @@ export default function Contact() {
 
   return (
     <main className="min-h-screen bg-white text-slate-800">
+
       {/* Contact Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:py-20">
+
           <div className="relative z-10">
             <span className="inline-flex rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800">
               We'd love to hear from you
@@ -136,6 +150,7 @@ export default function Contact() {
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-100 text-xl">
                 💬
               </div>
+
               <div>
                 <p className="font-semibold text-slate-900">
                   Your questions matter
@@ -149,12 +164,14 @@ export default function Contact() {
 
           <div className="relative">
             <div className="absolute -inset-4 rounded-[2rem] bg-emerald-100/60 blur-2xl" />
+
             <img
               src="https://nivesh.lentislegalis.com/wp-content/uploads/2026/05/efa5abb5-79a0-4efd-a7e4-a89db2916ef0-857x1024.png"
               alt="NiveshTrack financial guidance"
               className="relative mx-auto max-h-[500px] w-full rounded-3xl object-contain"
             />
           </div>
+
         </div>
       </section>
 
@@ -178,7 +195,9 @@ export default function Contact() {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+
             <div className="grid gap-5 sm:grid-cols-2">
+
               <div>
                 <label
                   htmlFor="firstName"
@@ -186,6 +205,7 @@ export default function Contact() {
                 >
                   First Name <span className="text-red-500">*</span>
                 </label>
+
                 <input
                   id="firstName"
                   name="firstName"
@@ -206,6 +226,7 @@ export default function Contact() {
                 >
                   Last Name <span className="text-red-500">*</span>
                 </label>
+
                 <input
                   id="lastName"
                   name="lastName"
@@ -218,6 +239,7 @@ export default function Contact() {
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
                 />
               </div>
+
             </div>
 
             <div>
@@ -227,6 +249,7 @@ export default function Contact() {
               >
                 Email Address <span className="text-red-500">*</span>
               </label>
+
               <input
                 id="email"
                 name="email"
@@ -247,6 +270,7 @@ export default function Contact() {
               >
                 Mobile Number <span className="text-red-500">*</span>
               </label>
+
               <input
                 id="phone"
                 name="phone"
@@ -269,6 +293,7 @@ export default function Contact() {
               >
                 Service Required <span className="text-red-500">*</span>
               </label>
+
               <select
                 id="service"
                 name="service"
@@ -295,6 +320,7 @@ export default function Contact() {
               >
                 Approximate Monthly Investment (₹)
               </label>
+
               <input
                 id="monthlyAmount"
                 name="monthlyAmount"
@@ -314,6 +340,7 @@ export default function Contact() {
               >
                 Comment or Message <span className="text-red-500">*</span>
               </label>
+
               <textarea
                 id="message"
                 name="message"
@@ -347,6 +374,7 @@ export default function Contact() {
                 {status}
               </p>
             )}
+
           </form>
         </div>
       </section>
@@ -354,22 +382,30 @@ export default function Contact() {
       {/* Get in Touch */}
       <section className="mx-auto max-w-7xl px-5 pb-10 sm:px-8">
         <div className="rounded-3xl bg-emerald-950 p-7 text-white sm:p-10">
+
           <span className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
             Get in Touch
           </span>
-          <h2 className="mt-3 text-3xl font-extrabold">Let's Connect</h2>
+
+          <h2 className="mt-3 text-3xl font-extrabold">
+            Let's Connect
+          </h2>
+
           <p className="mt-3 max-w-2xl text-base leading-8 text-emerald-100">
             We're here to help you with your investment and financial planning
             questions.
           </p>
 
           <div className="mt-8 grid gap-7 border-t border-white/15 pt-7 md:grid-cols-2">
+
             <div className="flex gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
                 📍
               </div>
+
               <div>
                 <h3 className="text-lg font-bold">Our Office</h3>
+
                 <p className="mt-2 text-base leading-8 text-emerald-100">
                   Wealth Bees, Janki Vallabh Complex, Veer Vinay Chowk, near
                   Union Bank, Mohalla Chikni, Alijanpurva, Balrampur, Uttar
@@ -382,10 +418,15 @@ export default function Contact() {
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
                 ✉️
               </div>
+
               <div>
-                <h3 className="text-lg font-bold">Contact Information</h3>
+                <h3 className="text-lg font-bold">
+                  Contact Information
+                </h3>
+
                 <p className="mt-3 text-base leading-7 text-emerald-100">
                   <span className="font-semibold text-white">Phone: </span>
+
                   <a
                     href="tel:07800450600"
                     className="hover:text-white hover:underline"
@@ -393,8 +434,10 @@ export default function Contact() {
                     078004 50600
                   </a>
                 </p>
+
                 <p className="mt-2 text-base leading-7 text-emerald-100">
                   <span className="font-semibold text-white">Website: </span>
+
                   <a
                     href="https://wealthbees.in"
                     target="_blank"
@@ -404,6 +447,7 @@ export default function Contact() {
                     wealthbees.in
                   </a>
                 </p>
+
                 <a
                   href="https://www.google.com/maps/dir/?api=1&destination=Wealth+Bees%2C+Janki+Vallabh+Complex%2C+Balrampur%2C+Uttar+Pradesh+271201"
                   target="_blank"
@@ -414,6 +458,7 @@ export default function Contact() {
                 </a>
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -424,14 +469,18 @@ export default function Contact() {
         className="mx-auto max-w-7xl px-5 pb-14 sm:px-8 lg:pb-20"
       >
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+
           <div className="flex flex-wrap items-center justify-between gap-4 p-6 sm:p-8">
+
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
                 Find Us
               </p>
+
               <h2 className="mt-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">
                 Visit Our Office
               </h2>
+
               <p className="mt-2 text-base leading-7 text-slate-600">
                 Balrampur, Uttar Pradesh 271201, India
               </p>
@@ -445,6 +494,7 @@ export default function Contact() {
             >
               Open in Google Maps ↗
             </a>
+
           </div>
 
           <iframe
@@ -457,20 +507,27 @@ export default function Contact() {
             referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen
           />
+
         </div>
       </section>
 
       {/* Investment CTA */}
       <section className="overflow-hidden bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-800 px-5 py-14 text-white sm:px-8 sm:py-16">
+
         <div className="mx-auto grid max-w-7xl items-center gap-8 md:grid-cols-[1fr_auto]">
+
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-emerald-300">
               Your financial journey starts here
             </p>
+
             <h2 className="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl">
               Let's Start{" "}
-              <span className="text-emerald-400">Investing Now</span>
+              <span className="text-emerald-400">
+                Investing Now
+              </span>
             </h2>
+
             <p className="mt-4 max-w-2xl leading-7 text-emerald-100">
               Learn more about investing, explore financial opportunities and
               take informed steps toward your future.
@@ -483,8 +540,10 @@ export default function Contact() {
           >
             Explore Services →
           </a>
+
         </div>
       </section>
+
     </main>
   );
 }

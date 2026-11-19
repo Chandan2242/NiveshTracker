@@ -20,16 +20,25 @@ const { advisorOnly } = require("../middlewares/advisorMiddleware");
 // All advisor routes require authentication and active advisor role
 router.use(protect, advisorOnly);
 
-// Advisor dashboard
+// ================= ADVISOR DASHBOARD =================
 router.get("/dashboard", getDashboardStats);
 
-// Assigned clients
+// ================= ASSIGNED REGISTERED CLIENTS =================
 router.get("/clients", getMyClients);
-router.get("/clients/:clientId", getClientDetails);
-router.get("/clients/:clientId/investments", getClientInvestments);
 
-// Assigned clients' investment requests
-router.get("/investment-requests", getAdvisorInvestmentRequests);
+router.get("/clients/:clientId", getClientDetails);
+
+router.get(
+  "/clients/:clientId/investments",
+  getClientInvestments
+);
+
+// ================= INVESTMENT REQUESTS =================
+router.get(
+  "/investment-requests",
+  getAdvisorInvestmentRequests
+);
+
 router.patch(
   "/investment-requests/:id/status",
   updateAdvisorInvestmentRequestStatus

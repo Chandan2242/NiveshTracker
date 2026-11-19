@@ -1,5 +1,8 @@
-const jwt = require("jsonwebtoken");
 
+const jwt = require("jsonwebtoken");
+const pool = require("../config/db");
+
+// ================= PROTECT MIDDLEWARE =================
 const protect = (req, res, next) => {
   let token;
 
@@ -33,4 +36,40 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+// ================= ADMIN ONLY MIDDLEWARE =================
+const adminOnly = async (req, res, next) => {
+  try {
+    const [users] = await pool.execute(
+      `SELECT id, role, status
+       FROM users
+       WHERE id = ?
+       LIMIT 1`,
+      [req.user.id]
+    );
+
+    if (
+      users.length === 0 ||
+      users[0].role !== "admin" ||
+      users[0].status !== "active"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin only."
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("ADMIN MIDDLEWARE ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to verify admin access."
+    });
+  }
+};
+
+module.exports = {
+  protect,
+  adminOnly
+};
