@@ -13,39 +13,6 @@ const LanguageContext = createContext(null);
 
 const LANGUAGE_KEY = "nivesh-language";
 
-function clearGoogleTranslateCookie() {
-  const hostname = window.location.hostname;
-
-  // Remove host-only cookie
-  document.cookie =
-    "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-
-  // Remove custom-domain cookie, if applicable
-  if (hostname.endsWith(".lentislegalis.com") ||
-      hostname === "lentislegalis.com") {
-    document.cookie =
-      "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.lentislegalis.com";
-  }
-}
-
-function setGoogleTranslateCookie(language) {
-  clearGoogleTranslateCookie();
-
-  if (language === "HI") {
-    const hostname = window.location.hostname;
-
-    if (
-      hostname === "lentislegalis.com" ||
-      hostname.endsWith(".lentislegalis.com")
-    ) {
-      document.cookie =
-        "googtrans=/en/hi; path=/; domain=.lentislegalis.com";
-    } else {
-      document.cookie = "googtrans=/en/hi; path=/";
-    }
-  }
-}
-
 function getSavedLanguage() {
   try {
     return localStorage.getItem(LANGUAGE_KEY) === "HI"
@@ -64,21 +31,15 @@ export function LanguageProvider({ children }) {
       return;
     }
 
-    if (newLanguage === language) {
-      return;
-    }
-
     try {
       localStorage.setItem(LANGUAGE_KEY, newLanguage);
     } catch (error) {
       console.error("Unable to save language:", error);
     }
 
-    setGoogleTranslateCookie(newLanguage);
-
-    // Reload page so Google Translate starts with the selected language
-    window.location.reload();
-  }, [language]);
+    // Change language without reloading or navigating
+    setLanguageState(newLanguage);
+  }, []);
 
   const t = useCallback(
     (text) => {
@@ -96,11 +57,6 @@ export function LanguageProvider({ children }) {
       language === "HI" ? "hi" : "en";
 
     document.documentElement.dataset.language = language;
-
-    // Remove any old Google Translate cookie when English is selected
-    if (language === "EN") {
-      clearGoogleTranslateCookie();
-    }
 
     window.dispatchEvent(
       new CustomEvent("nivesh-language-change", {
